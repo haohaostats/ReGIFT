@@ -1,11 +1,32 @@
-# ReGIFT
+<p align="center">
+  <img src="man/figures/regift-logo.svg" width="155" alt="ReGIFT logo">
+</p>
 
-**Replicate-Guided Matrix Factorization for Single-Cell Transcriptomics**
+<h1 align="center">ReGIFT</h1>
+
+<p align="center"><strong>Replicate-Guided Matrix Factorization for Single-Cell Transcriptomics</strong></p>
+
+<p align="center">
+  <a href="https://github.com/haohaostats/ReGIFT/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/haohaostats/ReGIFT/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R CMD check"></a>
+  <img src="https://img.shields.io/badge/R-%E2%89%A54.3-276DC3?logo=r&amp;logoColor=white" alt="R version">
+  <img src="https://img.shields.io/badge/compute-CPU--only-2A9D8F" alt="CPU only">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-173B57" alt="MIT license"></a>
+</p>
+
+<p align="center">
+  <img src="man/figures/regift-overview.svg" width="100%" alt="ReGIFT analysis overview">
+</p>
 
 ReGIFT is an R package for recovering condition responses that generalize
 across biological replicates while separating donor-specific deviations and
 technical variation. Performance-critical updates are implemented in C++ via
 Rcpp and run on CPU; a GPU is not required.
+
+## Why ReGIFT?
+
+| Generalizable response | Replicate-aware separation | Practical implementation |
+|:--|:--|:--|
+| Recovers condition programs shared across biological donors. | Separates shared response, donor-specific deviations, and technical variation. | Interpretable R interface with compiled C++ updates and no GPU requirement. |
 
 ## Installation
 

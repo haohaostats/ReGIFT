@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 520" role="img" aria-labelledby="title desc">
+  <title id="title">ReGIFT analysis overview</title>
+  <desc id="desc">Replicated single-cell experiments enter a matrix-factorization model that separates generalizable responses, donor deviations, and technical variation.</desc>
+  <defs>
+    <linearGradient id="softBlue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F4F8FC"/><stop offset="1" stop-color="#E8F0F7"/></linearGradient>
+    <linearGradient id="core" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#173B57"/><stop offset="1" stop-color="#315F7D"/></linearGradient>
+    <linearGradient id="trajectory" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#3267C8"/><stop offset="0.52" stop-color="#8C6BC8"/><stop offset="1" stop-color="#E55B5B"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#173B57" flood-opacity="0.12"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#405566"/></marker>
+  </defs>
+  <rect width="1400" height="520" fill="white"/>
+  <text x="55" y="54" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#173B57">Replicated single-cell experiment</text>
+  <text x="55" y="83" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#617486">biological donors · conditions · cell states</text>
+
+  <g transform="translate(55 112)">
+    <rect width="320" height="310" rx="24" fill="url(#softBlue)" stroke="#D6E0E8" stroke-width="2"/>
+    <g transform="translate(27 29)">
+      <g transform="translate(0 0)" fill="#3267C8"><circle cx="22" cy="18" r="12"/><path d="M7 68c0-25 6-39 15-39s15 14 15 39z"/><path d="M11 63l-8 35M33 63l8 35" stroke="#3267C8" stroke-width="7" stroke-linecap="round"/></g>
+      <g transform="translate(61 0)" fill="#2A9D8F"><circle cx="22" cy="18" r="12"/><path d="M7 68c0-25 6-39 15-39s15 14 15 39z"/><path d="M11 63l-8 35M33 63l8 35" stroke="#2A9D8F" stroke-width="7" stroke-linecap="round"/></g>
+      <g transform="translate(122 0)" fill="#E55B5B"><circle cx="22" cy="18" r="12"/><path d="M7 68c0-25 6-39 15-39s15 14 15 39z"/><path d="M11 63l-8 35M33 63l8 35" stroke="#E55B5B" stroke-width="7" stroke-linecap="round"/></g>
+      <g transform="translate(183 0)" fill="#8C6BC8"><circle cx="22" cy="18" r="12"/><path d="M7 68c0-25 6-39 15-39s15 14 15 39z"/><path d="M11 63l-8 35M33 63l8 35" stroke="#8C6BC8" stroke-width="7" stroke-linecap="round"/></g>
+      <g transform="translate(244 0)" fill="#D29A3A"><circle cx="22" cy="18" r="12"/><path d="M7 68c0-25 6-39 15-39s15 14 15 39z"/><path d="M11 63l-8 35M33 63l8 35" stroke="#D29A3A" stroke-width="7" stroke-linecap="round"/></g>
+    </g>
+    <g transform="translate(28 156)">
+      <text x="0" y="0" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#617486">CONTROL</text>
+      <rect x="0" y="15" width="264" height="20" rx="10" fill="#DCE6EE"/><circle cx="31" cy="25" r="8" fill="#3267C8"/><circle cx="82" cy="25" r="8" fill="#2A9D8F"/><circle cx="133" cy="25" r="8" fill="#E55B5B"/><circle cx="184" cy="25" r="8" fill="#8C6BC8"/><circle cx="235" cy="25" r="8" fill="#D29A3A"/>
+      <text x="0" y="75" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#617486">CONDITION</text>
+      <rect x="0" y="90" width="264" height="20" rx="10" fill="#F4D9D9"/><circle cx="31" cy="100" r="8" fill="#3267C8"/><circle cx="82" cy="100" r="8" fill="#2A9D8F"/><circle cx="133" cy="100" r="8" fill="#E55B5B"/><circle cx="184" cy="100" r="8" fill="#8C6BC8"/><circle cx="235" cy="100" r="8" fill="#D29A3A"/>
+    </g>
+  </g>
+
+  <path d="M392 267H446" stroke="#405566" stroke-width="4" marker-end="url(#arrow)"/>
+  <g transform="translate(463 142)" filter="url(#shadow)">
+    <rect width="210" height="246" rx="24" fill="white" stroke="#D6E0E8" stroke-width="2"/>
+    <text x="105" y="35" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#173B57">Expression matrix</text>
+    <g transform="translate(29 56)">
+      <rect width="152" height="150" rx="7" fill="#F4F7FA"/>
+      <g stroke="white" stroke-width="3">
+        <path d="M0 0h38v30H0z" fill="#B9D2E8"/><path d="M38 0h38v30H38z" fill="#E9B1A8"/><path d="M76 0h38v30H76z" fill="#315F7D"/><path d="M114 0h38v30h-38z" fill="#F1D4CC"/>
+        <path d="M0 30h38v30H0z" fill="#E55B5B"/><path d="M38 30h38v30H38z" fill="#DDEAF3"/><path d="M76 30h38v30H76z" fill="#91B9D6"/><path d="M114 30h38v30h-38z" fill="#274D6B"/>
+        <path d="M0 60h38v30H0z" fill="#E8F0F6"/><path d="M38 60h38v30H38z" fill="#C8635C"/><path d="M76 60h38v30H76z" fill="#F2CEC4"/><path d="M114 60h38v30h-38z" fill="#7FAACB"/>
+        <path d="M0 90h38v30H0z" fill="#3E6F91"/><path d="M38 90h38v30H38z" fill="#F4E7E1"/><path d="M76 90h38v30H76z" fill="#D98578"/><path d="M114 90h38v30h-38z" fill="#D4E5F0"/>
+        <path d="M0 120h38v30H0z" fill="#A4C5DC"/><path d="M38 120h38v30H38z" fill="#315F7D"/><path d="M76 120h38v30H76z" fill="#F2C5BB"/><path d="M114 120h38v30h-38z" fill="#E55B5B"/>
+      </g>
+    </g>
+    <text x="105" y="229" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#617486">cells × genes</text>
+  </g>
+
+  <path d="M691 267H741" stroke="#405566" stroke-width="4" marker-end="url(#arrow)"/>
+  <g transform="translate(759 112)" filter="url(#shadow)">
+    <rect width="280" height="310" rx="28" fill="url(#core)"/>
+    <text x="140" y="51" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="white">ReGIFT</text>
+    <text x="140" y="77" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="11.5" font-weight="700" letter-spacing="0.8" fill="#BDD0DE">REPLICATE-GUIDED FACTORIZATION</text>
+    <g transform="translate(38 101)">
+      <path d="M0 104C42 103 57 85 87 83C121 81 139 37 201 28" fill="none" stroke="url(#trajectory)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M0 126C42 125 61 111 91 109C129 106 150 68 205 61" fill="none" stroke="#AFC0CC" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 7"/>
+      <circle cx="87" cy="83" r="9" fill="#8C6BC8" stroke="white" stroke-width="3"/><circle cx="201" cy="28" r="9" fill="#E55B5B" stroke="white" stroke-width="3"/>
+    </g>
+    <g transform="translate(26 254)">
+      <rect width="69" height="29" rx="14" fill="#2A9D8F"/><text x="34.5" y="20" text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="white">shared</text>
+      <rect x="79" width="82" height="29" rx="14" fill="#8C6BC8"/><text x="120" y="20" text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="white">donor</text>
+      <rect x="171" width="83" height="29" rx="14" fill="#D29A3A"/><text x="212.5" y="20" text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="white">technical</text>
+    </g>
+  </g>
+
+  <path d="M1057 267H1109" stroke="#405566" stroke-width="4" marker-end="url(#arrow)"/>
+  <g transform="translate(1127 112)">
+    <rect width="226" height="310" rx="24" fill="#F8FAFC" stroke="#D6E0E8" stroke-width="2"/>
+    <text x="113" y="39" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#173B57">Interpretable outputs</text>
+    <g transform="translate(24 64)">
+      <rect width="178" height="58" rx="13" fill="#E6F4F1"/><circle cx="27" cy="29" r="13" fill="#2A9D8F"/><path d="M54 38C79 38 81 20 105 21C127 21 137 10 157 9" fill="none" stroke="#2A9D8F" stroke-width="4" stroke-linecap="round"/><text x="54" y="55" font-family="Arial" font-size="12" font-weight="700" fill="#246E65">generalizable response</text>
+      <rect y="76" width="178" height="58" rx="13" fill="#EFEAF8"/><circle cx="27" cy="105" r="13" fill="#8C6BC8"/><path d="M54 111l27-20l25 13l23-27l28 18" fill="none" stroke="#8C6BC8" stroke-width="4" stroke-linecap="round"/><text x="54" y="129" font-family="Arial" font-size="12" font-weight="700" fill="#665092">donor-specific deviation</text>
+      <rect y="152" width="178" height="58" rx="13" fill="#FBF2E2"/><circle cx="27" cy="181" r="13" fill="#D29A3A"/><path d="M55 190l14-20l14 17l14-26l14 24l14-13l14 16l17-25" fill="none" stroke="#D29A3A" stroke-width="3" stroke-linecap="round"/><text x="54" y="205" font-family="Arial" font-size="12" font-weight="700" fill="#956C25">technical variation</text>
+    </g>
+    <text x="113" y="294" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#617486">CPU · interpretable · replicate-aware</text>
+  </g>
+
+  <text x="700" y="485" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#173B57">Recover condition responses that generalize across biological replicates</text>
+</svg>

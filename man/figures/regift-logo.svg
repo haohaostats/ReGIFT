@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 320" role="img" aria-labelledby="title desc">
+  <title id="title">ReGIFT logo</title>
+  <desc id="desc">Hexagonal logo with replicated donors, a response trajectory, and a gene-expression matrix.</desc>
+  <defs>
+    <linearGradient id="hex" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#173B57"/>
+      <stop offset="1" stop-color="#315F7D"/>
+    </linearGradient>
+    <linearGradient id="response" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3267C8"/>
+      <stop offset="0.52" stop-color="#8C6BC8"/>
+      <stop offset="1" stop-color="#E55B5B"/>
+    </linearGradient>
+  </defs>
+  <path d="M140 9 L263 80 L263 222 L140 293 L17 222 L17 80 Z" fill="white" stroke="url(#hex)" stroke-width="10"/>
+  <g transform="translate(48 52)">
+    <g fill="#3267C8">
+      <circle cx="18" cy="14" r="9"/><path d="M7 49c0-16 5-25 11-25s11 9 11 25z"/>
+      <circle cx="57" cy="14" r="9"/><path d="M46 49c0-16 5-25 11-25s11 9 11 25z"/>
+    </g>
+    <g fill="#2A9D8F">
+      <circle cx="96" cy="14" r="9"/><path d="M85 49c0-16 5-25 11-25s11 9 11 25z"/>
+      <circle cx="135" cy="14" r="9"/><path d="M124 49c0-16 5-25 11-25s11 9 11 25z"/>
+    </g>
+    <g fill="#E55B5B">
+      <circle cx="174" cy="14" r="9"/><path d="M163 49c0-16 5-25 11-25s11 9 11 25z"/>
+    </g>
+  </g>
+  <g transform="translate(56 119)">
+    <path d="M0 58 C34 56 42 43 66 41 C94 38 104 8 157 5" fill="none" stroke="url(#response)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M0 73 C36 72 49 61 72 60 C103 57 118 29 166 26" fill="none" stroke="#A7B5C2" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 7"/>
+    <circle cx="66" cy="41" r="7" fill="#8C6BC8" stroke="white" stroke-width="3"/>
+    <circle cx="157" cy="5" r="7" fill="#E55B5B" stroke="white" stroke-width="3"/>
+  </g>
+  <text x="140" y="222" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700" fill="#173B57">ReGIFT</text>
+  <text x="140" y="247" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" letter-spacing="1.2" fill="#617486">REPLICATE-GUIDED</text>
+</svg>
