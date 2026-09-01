@@ -69,12 +69,6 @@ A hosted ReGIFT Shiny application will provide a graphical interface using the
 same R package computational engine. Only the deployed application link—not
 the Shiny source code—will be published in this repository.
 
-## Scope
-
-This repository contains the ReGIFT user software. Manuscript figure scripts,
-benchmark implementations, and public-data reproduction workflows are not part
-of the R package distribution.
-
 ## License
 
 ReGIFT is released under the MIT License.
