@@ -65,9 +65,8 @@ conditions. A coarse state annotation is optional.
 
 ## Web application
 
-A hosted ReGIFT Shiny application will provide a graphical interface using the
-same R package computational engine. Only the deployed application link—not
-the Shiny source code—will be published in this repository.
+Use the [ReGIFT web application](https://01a05bda-7ce0-7fc5-2085-edb0113e15eb.share.connect.posit.cloud/)
+to run the same analysis through a browser-based interface.
 
 ## License
 
