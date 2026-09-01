@@ -1,0 +1,12 @@
+*.Rcheck/
+*.tar.gz
+src/*.o
+src/*.dll
+src/*.so
+src/tmp.def
+tmp/
+data/external/
+data/public/
+data-raw/hpap_subset_tmp/
+.Rhistory
+.RData

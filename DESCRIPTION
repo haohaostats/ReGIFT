@@ -1,0 +1,22 @@
+Package: ReGIFT
+Type: Package
+Title: Replicate-Guided Matrix Factorization for Single-Cell Transcriptomics
+Version: 0.0.1
+Authors@R: person("ReGIFT", "Development Team", role = c("aut", "cre"),
+    email = "haohaostats@users.noreply.github.com")
+Description: Fits interpretable replicate-guided matrix factorization models
+    to single-cell count data. ReGIFT separates condition responses that are
+    shared across biological replicates from donor-specific deviations and
+    technical variation, and provides state-resolved response summaries,
+    held-out donor projection, and donor-level inference.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.3.0)
+Imports: Matrix, Rcpp, stats
+LinkingTo: Rcpp, RcppArmadillo
+Suggests: testthat (>= 3.0.0)
+Config/testthat/edition: 3
+LazyData: true
+RoxygenNote: 7.3.3
+URL: https://github.com/haohaostats/ReGIFT
+BugReports: https://github.com/haohaostats/ReGIFT/issues

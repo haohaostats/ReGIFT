@@ -1,0 +1,20 @@
+#' Small HPAP pancreas example for ReGIFT
+#'
+#' A deterministic subset of public HPAP single-cell pancreatic-islet data.
+#' It contains five donors with type 1 diabetes, five control donors, four
+#' pancreatic cell states, and 240 genes. At most 20 cells were sampled per
+#' donor-state combination. The subset is intended for examples, installation
+#' checks, and interface tutorials; it is not a substitute for the full study.
+#'
+#' @format A list with five components:
+#' \describe{
+#'   \item{counts}{A sparse cell-by-gene integer count matrix.}
+#'   \item{meta}{Cell metadata containing `cell`, `donor`, `sample`,
+#'     `condition`, `state`, `sex`, and the source cell barcode.}
+#'   \item{contrasts}{The T1D-versus-control contrast matrix.}
+#'   \item{genes}{Gene symbols and Ensembl identifiers.}
+#'   \item{provenance}{Study citation, accession, and sampling details.}
+#' }
+#' @source Fasolino et al. (2022),
+#'   \doi{10.1038/s42255-022-00531-x}; GEO accession GSE148073.
+"regift_example"
