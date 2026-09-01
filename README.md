@@ -70,6 +70,24 @@ head(regift_response_table(fit, "T1D-control"))
 pancreatic-islet dataset (GSE148073): five T1D donors, five control donors,
 four cell states, and 240 genes. The full HPAP object is not bundled.
 
+## Example output
+
+The panels below are computed directly from `regift_example` with the frozen
+package defaults. They show cell-level response geometry, a state-gene response
+atlas, and descriptive concordance of each donor with the remaining donors.
+This compact dataset demonstrates the interface and output structure; it is not
+used as a performance benchmark.
+
+<p align="center">
+  <img src="man/figures/regift-example-output.svg" width="100%" alt="ReGIFT output from the bundled HPAP example">
+</p>
+
+The example fit contains 748 cells, 240 genes, and 10 biological donors and
+converges in 19 fitting sweeps. The complete state-gene result is available as
+[`regift_example_response.csv`](inst/extdata/regift_example_response.csv), and
+[`hpap_quickstart.R`](inst/examples/hpap_quickstart.R) reproduces both the table
+and visualization from the bundled counts.
+
 Input count matrices must have cells in rows and genes in columns. Metadata
 must contain one row per cell and identify biological donors, samples, and
 conditions. A coarse state annotation is optional.

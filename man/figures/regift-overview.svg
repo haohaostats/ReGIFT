@@ -14,18 +14,56 @@
 
   <g transform="translate(55 112)">
     <rect width="320" height="310" rx="24" fill="url(#softBlue)" stroke="#D6E0E8" stroke-width="2"/>
-    <g transform="translate(27 29)">
-      <g transform="translate(0 0)" fill="#3267C8"><circle cx="22" cy="18" r="12"/><path d="M7 68c0-25 6-39 15-39s15 14 15 39z"/><path d="M11 63l-8 35M33 63l8 35" stroke="#3267C8" stroke-width="7" stroke-linecap="round"/></g>
-      <g transform="translate(61 0)" fill="#2A9D8F"><circle cx="22" cy="18" r="12"/><path d="M7 68c0-25 6-39 15-39s15 14 15 39z"/><path d="M11 63l-8 35M33 63l8 35" stroke="#2A9D8F" stroke-width="7" stroke-linecap="round"/></g>
-      <g transform="translate(122 0)" fill="#E55B5B"><circle cx="22" cy="18" r="12"/><path d="M7 68c0-25 6-39 15-39s15 14 15 39z"/><path d="M11 63l-8 35M33 63l8 35" stroke="#E55B5B" stroke-width="7" stroke-linecap="round"/></g>
-      <g transform="translate(183 0)" fill="#8C6BC8"><circle cx="22" cy="18" r="12"/><path d="M7 68c0-25 6-39 15-39s15 14 15 39z"/><path d="M11 63l-8 35M33 63l8 35" stroke="#8C6BC8" stroke-width="7" stroke-linecap="round"/></g>
-      <g transform="translate(244 0)" fill="#D29A3A"><circle cx="22" cy="18" r="12"/><path d="M7 68c0-25 6-39 15-39s15 14 15 39z"/><path d="M11 63l-8 35M33 63l8 35" stroke="#D29A3A" stroke-width="7" stroke-linecap="round"/></g>
+    <g transform="translate(22 15)">
+      <g transform="translate(0 0)"><circle cx="24" cy="24" r="22" fill="white" stroke="#C9D8E4" stroke-width="2"/><circle cx="24" cy="17" r="7" fill="#3267C8"/><path d="M10 40c2-12 8-17 14-17s12 5 14 17" fill="#3267C8"/></g>
+      <g transform="translate(56 0)"><circle cx="24" cy="24" r="22" fill="white" stroke="#C9D8E4" stroke-width="2"/><circle cx="24" cy="17" r="7" fill="#2A9D8F"/><path d="M10 40c2-12 8-17 14-17s12 5 14 17" fill="#2A9D8F"/></g>
+      <g transform="translate(112 0)"><circle cx="24" cy="24" r="22" fill="white" stroke="#C9D8E4" stroke-width="2"/><circle cx="24" cy="17" r="7" fill="#E55B5B"/><path d="M10 40c2-12 8-17 14-17s12 5 14 17" fill="#E55B5B"/></g>
+      <g transform="translate(168 0)"><circle cx="24" cy="24" r="22" fill="white" stroke="#C9D8E4" stroke-width="2"/><circle cx="24" cy="17" r="7" fill="#8C6BC8"/><path d="M10 40c2-12 8-17 14-17s12 5 14 17" fill="#8C6BC8"/></g>
+      <g transform="translate(224 0)"><circle cx="24" cy="24" r="22" fill="white" stroke="#C9D8E4" stroke-width="2"/><circle cx="24" cy="17" r="7" fill="#D29A3A"/><path d="M10 40c2-12 8-17 14-17s12 5 14 17" fill="#D29A3A"/></g>
+      <text x="136" y="65" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" letter-spacing="1" fill="#617486">BIOLOGICAL REPLICATES</text>
     </g>
-    <g transform="translate(28 156)">
-      <text x="0" y="0" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#617486">CONTROL</text>
-      <rect x="0" y="15" width="264" height="20" rx="10" fill="#DCE6EE"/><circle cx="31" cy="25" r="8" fill="#3267C8"/><circle cx="82" cy="25" r="8" fill="#2A9D8F"/><circle cx="133" cy="25" r="8" fill="#E55B5B"/><circle cx="184" cy="25" r="8" fill="#8C6BC8"/><circle cx="235" cy="25" r="8" fill="#D29A3A"/>
-      <text x="0" y="75" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#617486">CONDITION</text>
-      <rect x="0" y="90" width="264" height="20" rx="10" fill="#F4D9D9"/><circle cx="31" cy="100" r="8" fill="#3267C8"/><circle cx="82" cy="100" r="8" fill="#2A9D8F"/><circle cx="133" cy="100" r="8" fill="#E55B5B"/><circle cx="184" cy="100" r="8" fill="#8C6BC8"/><circle cx="235" cy="100" r="8" fill="#D29A3A"/>
+
+    <g transform="translate(18 91)">
+      <!-- Anatomical donor with highlighted tissue -->
+      <g transform="translate(0 0)">
+        <circle cx="27" cy="10" r="8" fill="#F2C9BD" stroke="#8B6570" stroke-width="1.5"/>
+        <path d="M18 23C8 28 7 44 10 58l5 18h24l5-18c3-14 2-30-8-35l-5-3h-8z" fill="#F8FBFD" stroke="#567086" stroke-width="2"/>
+        <path d="M15 31L5 55M39 31l10 24M20 75l-4 17M34 75l4 17" fill="none" stroke="#567086" stroke-width="4" stroke-linecap="round"/>
+        <path d="M18 48c6-6 14-5 19 0c-5 7-13 9-19 3z" fill="#E98B70" stroke="#B55452" stroke-width="1.5"/>
+        <path d="M22 49c4-2 7-2 11 0" fill="none" stroke="#FFF4EF" stroke-width="1.4"/>
+      </g>
+      <path d="M55 49H76" stroke="#405566" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <!-- Isolated organ -->
+      <g transform="translate(82 27)">
+        <path d="M0 25C12 9 30 7 42 13c12 6 28 2 40 10c-14 16-36 17-55 12c-10-2-19-3-27-10z" fill="#E9A58E" stroke="#9F625C" stroke-width="2"/>
+        <path d="M9 25c18-3 41 7 64-1" fill="none" stroke="#F8D4C8" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="28" cy="20" r="3" fill="#C65B58"/><circle cx="47" cy="27" r="3" fill="#C65B58"/>
+      </g>
+      <path d="M165 49H182" stroke="#405566" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <!-- Tissue slices -->
+      <g transform="translate(188 25)">
+        <ellipse cx="24" cy="35" rx="27" ry="10" fill="#E7AFA8" stroke="#9F625C" stroke-width="1.6"/>
+        <ellipse cx="24" cy="29" rx="27" ry="10" fill="#F0C8C1" stroke="#9F625C" stroke-width="1.6"/>
+        <ellipse cx="24" cy="23" rx="27" ry="10" fill="#F9E2DE" stroke="#9F625C" stroke-width="1.6"/>
+        <path d="M6 23c9-5 22-5 35 0c-10 4-22 5-35 0z" fill="#D87973" opacity="0.75"/>
+      </g>
+      <path d="M241 49H253" stroke="#405566" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <!-- Dissociated cells -->
+      <g transform="translate(259 24)" stroke="white" stroke-width="2">
+        <circle cx="13" cy="14" r="9" fill="#2A9D8F"/><circle cx="31" cy="9" r="8" fill="#3267C8"/><circle cx="45" cy="23" r="9" fill="#E55B5B"/>
+        <circle cx="23" cy="31" r="10" fill="#8C6BC8"/><circle cx="42" cy="41" r="8" fill="#D29A3A"/><circle cx="8" cy="44" r="8" fill="#4B91A8"/>
+        <g fill="#F7FAFC" stroke="none"><circle cx="13" cy="14" r="3"/><circle cx="31" cy="9" r="3"/><circle cx="45" cy="23" r="3"/><circle cx="23" cy="31" r="3"/><circle cx="42" cy="41" r="3"/><circle cx="8" cy="44" r="3"/></g>
+      </g>
+      <g font-family="Arial, Helvetica, sans-serif" font-size="10.5" font-weight="700" fill="#617486" text-anchor="middle">
+        <text x="27" y="108">patient</text><text x="123" y="108">tissue</text><text x="212" y="108">slices</text><text x="282" y="108">cells</text>
+      </g>
+    </g>
+
+    <g transform="translate(20 238)" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700">
+      <text x="0" y="13" fill="#617486">REF</text><rect x="42" y="0" width="238" height="18" rx="9" fill="#DCE6EE"/>
+      <text x="0" y="42" fill="#617486">COND</text><rect x="42" y="29" width="238" height="18" rx="9" fill="#F4D9D9"/>
+      <g><circle cx="66" cy="9" r="6" fill="#3267C8"/><circle cx="112" cy="9" r="6" fill="#2A9D8F"/><circle cx="158" cy="9" r="6" fill="#E55B5B"/><circle cx="204" cy="9" r="6" fill="#8C6BC8"/><circle cx="250" cy="9" r="6" fill="#D29A3A"/></g>
+      <g><circle cx="66" cy="38" r="6" fill="#3267C8"/><circle cx="112" cy="38" r="6" fill="#2A9D8F"/><circle cx="158" cy="38" r="6" fill="#E55B5B"/><circle cx="204" cy="38" r="6" fill="#8C6BC8"/><circle cx="250" cy="38" r="6" fill="#D29A3A"/></g>
     </g>
   </g>
 
