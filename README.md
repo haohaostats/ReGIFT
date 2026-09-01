@@ -1,32 +1,21 @@
-<p align="center">
-  <img src="man/figures/regift-logo.svg" width="155" alt="ReGIFT logo">
-</p>
+# ReGIFT
 
-<h1 align="center">ReGIFT</h1>
+[![R CMD check](https://github.com/haohaostats/ReGIFT/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/haohaostats/ReGIFT/actions/workflows/R-CMD-check.yaml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-<p align="center"><strong>Replicate-Guided Matrix Factorization for Single-Cell Transcriptomics</strong></p>
-
-<p align="center">
-  <a href="https://github.com/haohaostats/ReGIFT/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/haohaostats/ReGIFT/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R CMD check"></a>
-  <img src="https://img.shields.io/badge/R-%E2%89%A54.3-276DC3?logo=r&amp;logoColor=white" alt="R version">
-  <img src="https://img.shields.io/badge/compute-CPU--only-2A9D8F" alt="CPU only">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-173B57" alt="MIT license"></a>
-</p>
-
-<p align="center">
-  <img src="man/figures/regift-overview.svg" width="100%" alt="ReGIFT analysis overview">
-</p>
+**Replicate-Guided Matrix Factorization for Single-Cell Transcriptomics**
 
 ReGIFT is an R package for recovering condition responses that generalize
 across biological replicates while separating donor-specific deviations and
 technical variation. Performance-critical updates are implemented in C++ via
 Rcpp and run on CPU; a GPU is not required.
 
-## Why ReGIFT?
+## Features
 
-| Generalizable response | Replicate-aware separation | Practical implementation |
-|:--|:--|:--|
-| Recovers condition programs shared across biological donors. | Separates shared response, donor-specific deviations, and technical variation. | Interpretable R interface with compiled C++ updates and no GPU requirement. |
+- Recovers condition programs shared across biological donors.
+- Separates shared responses, donor-specific deviations, and technical variation.
+- Provides state-resolved summaries, held-out donor projection, and donor-level inference.
+- Uses compiled C++ updates on CPU and does not require a GPU.
 
 ## Installation
 
@@ -69,24 +58,6 @@ head(regift_response_table(fit, "T1D-control"))
 `regift_example` is a compact, deterministic subset of the public HPAP
 pancreatic-islet dataset (GSE148073): five T1D donors, five control donors,
 four cell states, and 240 genes. The full HPAP object is not bundled.
-
-## Example output
-
-The panels below are computed directly from `regift_example` with the frozen
-package defaults. They show cell-level response geometry, a state-gene response
-atlas, and descriptive concordance of each donor with the remaining donors.
-This compact dataset demonstrates the interface and output structure; it is not
-used as a performance benchmark.
-
-<p align="center">
-  <img src="man/figures/regift-example-output.svg" width="100%" alt="ReGIFT output from the bundled HPAP example">
-</p>
-
-The example fit contains 748 cells, 240 genes, and 10 biological donors and
-converges in 19 fitting sweeps. The complete state-gene result is available as
-[`regift_example_response.csv`](inst/extdata/regift_example_response.csv), and
-[`hpap_quickstart.R`](inst/examples/hpap_quickstart.R) reproduces both the table
-and visualization from the bundled counts.
 
 Input count matrices must have cells in rows and genes in columns. Metadata
 must contain one row per cell and identify biological donors, samples, and
