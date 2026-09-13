@@ -55,7 +55,7 @@ head(regift_response_table(fit, "T1D-control"))
 
 `regift_example` is a compact, deterministic subset of the public HPAP
 pancreatic-islet dataset (GSE148073): five T1D donors, five control donors,
-four cell states, and 240 genes. The full HPAP object is not bundled.
+four cell states, and 240 genes.
 
 Input count matrices must have cells in rows and genes in columns. Metadata
 must contain one row per cell and identify biological donors, samples, and
