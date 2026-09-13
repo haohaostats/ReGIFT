@@ -1,3 +1,75 @@
+# Match the established whole-input paired-design classification. For paired
+# data, condition anchors must remove donor baselines even when a rare state
+# has fewer than three complete donor-specific contrasts.
+.regift_anchor_is_paired <- function(meta) {
+  sample_meta <- meta[!duplicated(meta$sample), , drop = FALSE]
+  tab <- table(sample_meta$donor, sample_meta$condition)
+  all(rowSums(tab > 0) > 1L)
+}
+.regift_anchor_baseline <- function(meta, use_state = TRUE) {
+  paired <- .regift_anchor_is_paired(meta)
+  has_state <- isTRUE(use_state) && "state" %in% names(meta)
+  if (paired && has_state) return(paste(
+    match(meta$donor, unique(meta$donor)),
+    match(meta$state, unique(meta$state)), sep = "/"))
+  if (paired) return(as.character(meta$donor))
+  if (has_state) return(as.character(meta$state))
+  NULL
+}
+
+# Separate condition slopes from an unpenalized baseline. A state deviation
+# with incomplete condition support may use the identified row space only;
+# its unidentified directions are pooled to the global response (zero state
+# deviation), and this assumption is recorded in state_anchor_support.
+.regift_condition_slopes <- function(x, y, w, ridge = 1e-6,
+                                      allow_rank_deficient = FALSE,
+                                      return_info = FALSE, strata = NULL) {
+  x <- as.matrix(x); y <- as.matrix(y)
+  .regift_assert(nrow(x) == nrow(y) && length(w) == nrow(x),
+                 "Condition regression inputs have incompatible rows.")
+  .regift_assert(all(is.finite(x)) && all(is.finite(y)),
+                 "Condition regression inputs must be finite.")
+  .regift_assert(all(is.finite(w)) && all(w >= 0) && sum(w) > 0,
+                 "Condition regression weights must be finite, nonnegative and nonzero.")
+  if (is.null(strata)) strata <- rep("all", nrow(x))
+  .regift_assert(length(strata) == nrow(x) && !anyNA(strata) &&
+    all(nzchar(as.character(strata))), "Condition baseline strata are invalid.")
+  xc <- x; yc <- y
+  for (ii in split(seq_len(nrow(x)), as.character(strata))) {
+    sw <- sum(w[ii])
+    .regift_assert(sw > 0, "A condition baseline stratum has no positive weight.")
+    xc[ii, ] <- sweep(x[ii, , drop = FALSE], 2L,
+      colSums(x[ii, , drop = FALSE] * w[ii]) / sw, `-`)
+    yc[ii, ] <- sweep(y[ii, , drop = FALSE], 2L,
+      colSums(y[ii, , drop = FALSE] * w[ii]) / sw, `-`)
+  }
+  xs <- xc * sqrt(w)
+  sv <- svd(xs, nu = min(dim(xs)), nv = min(dim(xs)))
+  # Absolute floor prevents centering roundoff in a constant design from
+  # creating an apparent estimable direction.
+  keep <- sv$d > max(1e-10, max(sv$d) * 1e-8)
+  rank <- sum(keep)
+  .regift_assert(isTRUE(allow_rank_deficient) || rank == ncol(xc),
+                 "Condition effects are not estimable within this state.")
+  if (rank == ncol(xc)) {
+    coef <- .regift_solve(.regift_weighted_crossprod(xc, xc, w),
+      .regift_weighted_crossprod(xc, yc, w), ridge)
+  } else if (!rank) {
+    coef <- matrix(0, ncol(xc), ncol(yc))
+  } else {
+    v <- sv$v[, keep, drop = FALSE]
+    u <- sv$u[, keep, drop = FALSE]
+    rhs <- crossprod(u, yc * sqrt(w))
+    coef <- v %*% (rhs * (sv$d[keep] / (sv$d[keep]^2 + ridge)))
+  }
+  projection <- if (rank) tcrossprod(sv$v[, keep, drop = FALSE]) else
+    matrix(0, ncol(xc), ncol(xc))
+  if (isTRUE(return_info)) return(list(coefficients = coef, rank = rank,
+    required_rank = ncol(xc), partial_pooling = rank < ncol(xc),
+    identified_projection = projection))
+  coef
+}
+
 .regift_components <- function(fit, dcell) {
   n <- nrow(fit$Z); p <- nrow(fit$L0); qn <- dim(fit$B)[3L]
   A <- if (is.null(fit$A)) matrix(0, p, qn) else fit$A
@@ -48,6 +120,8 @@
                                          sweeps = 6L) {
   p <- ncol(Y); qn <- ncol(dcell)
   out <- array(0, c(p, qn, length(state_levels)))
+  support <- vector("list", length(state_levels))
+  paired_design <- .regift_anchor_is_paired(meta)
   for (h in seq_along(state_levels)) {
     ii <- which(meta$state == state_levels[h])
     mh <- meta[ii, , drop = FALSE]; xh <- dcell[ii, , drop = FALSE]
@@ -68,14 +142,31 @@
     if (length(donor_coef) >= 3L) {
       arr <- simplify2array(donor_coef)
       coef <- t(apply(arr, c(1, 2), .regift_adaptive_donor_location))
+      info <- list(rank = qn, required_rank = qn, partial_pooling = FALSE,
+                   identified_projection = diag(qn))
     } else {
       w <- .regift_sample_weights(mh)
-      gram <- .regift_weighted_crossprod(xh, xh, w)
-      coef <- t(.regift_solve(gram,
-        .regift_weighted_crossprod(xh, target, w), ridge))
+      info <- .regift_condition_slopes(xh, target, w, ridge,
+        allow_rank_deficient = TRUE, return_info = TRUE,
+        strata = if (paired_design) as.character(mh$donor) else NULL)
+      coef <- t(info$coefficients)
     }
     out[, , h] <- coef
+    support[[h]] <- data.frame(state = state_levels[h],
+      estimable_rank = info$rank, required_rank = info$required_rank,
+      partial_pooling = info$partial_pooling,
+      paired_donors = length(donor_coef), donors = length(unique(mh$donor)),
+      baseline_model = if (paired_design) "within-donor" else "between-donor",
+      conditions = length(unique(mh$condition)),
+      assumption = if (info$partial_pooling)
+        "unidentified state deviations pooled to global response" else
+        "state contrast supported by observed design", stringsAsFactors = FALSE)
+    support[[h]]$identified_projection <- I(list(info$identified_projection))
+    support[[h]]$donors_by_condition <- I(list(vapply(split(as.character(mh$donor),
+      as.character(mh$condition)), function(z) length(unique(z)), integer(1))))
+    support[[h]]$cells_by_condition <- I(list(table(mh$condition)))
   }
+  attr(out, "state_anchor_support") <- do.call(rbind, support)
   out
 }
 
@@ -175,7 +266,161 @@
     out[[nm]] <- old[[nm]] + alpha * (candidate[[nm]] - old[[nm]])
   out$U <- Map(function(a, b) a + alpha * (b - a), old$U, candidate$U)
   out$C <- Map(function(a, b) a + alpha * (b - a), old$C, candidate$C)
-  .regift_normalize(out)
+  .regift_project_nuisance(.regift_normalize(out))
+}
+
+# Experimental safeguard: interpolation does not preserve U' [d,Z,dZ] = 0.
+# Use a rank-revealing projection, without a ridge approximation.
+.regift_project_nuisance <- function(fit) {
+  d <- .regift_cell_design(fit$meta, fit$contrasts)
+  for (s in seq_along(fit$donors)) {
+    if (!ncol(fit$U[[s]])) next
+    ii <- which(fit$meta$donor == fit$donors[s])
+    z <- fit$Z[ii, , drop = FALSE]
+    x <- cbind(d[ii, , drop = FALSE], z,
+      do.call(cbind, lapply(seq_len(ncol(d)), function(q) z * d[ii, q])))
+    sv <- svd(x, nu = min(dim(x)), nv = 0L)
+    keep <- sv$d > max(sv$d) * 1e-10
+    basis <- sv$u[, keep, drop = FALSE]
+    fit$U[[s]] <- fit$U[[s]] - basis %*% crossprod(basis, fit$U[[s]])
+  }
+  fit
+}
+
+# Only free loading blocks are changed here. Z, U, B and Delta constraints
+# remain untouched. Acceptance always uses the original penalized objective.
+# Failure of these two probes is NOT a full-model stationarity certificate.
+.regift_free_block_fallback <- function(fit, Y, d, sigma, kappa, objective,
+                                         gene_block = 256L) {
+  rms <- .regift_sample_rms_blocked(fit, Y, d, gene_block)
+  h <- pmin(1, kappa * sigma / (rms + 1e-12))
+  w <- .regift_sample_weights(fit$meta, h) / ncol(Y)
+  best <- fit; value <- objective(fit); base_value <- value; block <- "none"
+  residual <- Y - .regift_fitted(fit, d)
+  for (nm in c("L0", "C")) {
+    candidate <- fit
+    if (nm == "L0") {
+      lip <- max(eigen(crossprod(fit$Z, fit$Z*w), symmetric=TRUE,
+                       only.values=TRUE)$values, 1e-12)
+      candidate$L0 <- fit$L0 + t(residual) %*% (fit$Z*w) / lip
+    } else for (s in seq_along(fit$donors)) {
+      u <- fit$U[[s]]
+      if (!ncol(u)) next
+      ii <- which(fit$meta$donor == fit$donors[s])
+      lip <- max(eigen(crossprod(u, u*w[ii]), symmetric=TRUE,
+                       only.values=TRUE)$values, 1e-12)
+      candidate$C[[s]] <- fit$C[[s]] +
+        t(residual[ii, , drop=FALSE]) %*% (u*w[ii]) / lip
+    }
+    for (a in 0.5^(0:20)) {
+      trial <- fit
+      if (nm == "L0") trial$L0 <- fit$L0 + a*(candidate$L0-fit$L0)
+      else trial$C <- Map(function(x,y) x+a*(y-x), fit$C, candidate$C)
+      v <- objective(trial)
+      if (is.finite(v) && v < base_value - 1e-12) {
+        if (v < value) { best <- trial; value <- v; block <- nm }
+        break
+      }
+    }
+  }
+  list(fit=best, objective=value, block=block)
+}
+
+# Feasible biological-block rescue. Retraction changes Z only: unlike a
+# factor-rescaling normalization, it cannot silently change B/Delta penalties.
+.regift_constrained_rescue <- function(fit, Y, d, sigma, kappa, objective,
+                                      lambda_B, lambda_Delta, gene_block) {
+  ans <- .regift_free_block_fallback(fit,Y,d,sigma,kappa,objective,gene_block)
+  base_value <- objective(fit)
+  rms <- .regift_sample_rms_blocked(fit,Y,d,gene_block)
+  w <- .regift_sample_weights(fit$meta,pmin(1,kappa*sigma/(rms+1e-12)))/ncol(Y)
+  r <- Y-.regift_fitted(fit,d)
+  nw <- fit$normalization_weights
+  if(is.null(nw))nw <- rep(1/nrow(Y),nrow(Y))
+  nw <- nw/sum(nw); v <- fit$Z*sqrt(nw)
+  gz <- matrix(0,nrow(Y),ncol(fit$Z)); lipz <- 1e-12
+  for(s in seq_along(fit$donors)) {
+    ii <- which(fit$meta$donor==fit$donors[s])
+    for(i in ii) {
+      loading <- fit$L0
+      for(q in seq_len(ncol(d)))loading <- loading+d[i,q]*(fit$B[,,q]+fit$Delta[s,,,q])
+      gz[i,] <- -as.numeric(r[i,,drop=FALSE]%*%loading)*w[i]/sqrt(nw[i])
+      lipz <- max(lipz,sum(loading^2)*w[i]/nw[i])
+    }
+    u <- fit$U[[s]]
+    if(ncol(u)) {
+      m <- cbind(u,do.call(cbind,lapply(seq_len(ncol(d)),function(q)u*d[ii,q])))/sqrt(nw[ii])
+      ss <- svd(m,nu=min(dim(m)),nv=0)
+      basis <- ss$u[,ss$d>max(ss$d)*1e-10,drop=FALSE]
+      gz[ii,] <- gz[ii,,drop=FALSE]-basis%*%crossprod(basis,gz[ii,,drop=FALSE])
+    }
+  }
+  vg <- crossprod(v,gz)
+  tangent <- gz-v%*%((vg+t(vg))/2)
+  for(a in 0.5^(0:20)) {
+    trial <- fit; vv <- v-a*tangent/lipz
+    trial$Z <- (vv%*%.regift_sym_sqrt(crossprod(vv),inverse=TRUE))/sqrt(nw)
+    value <- objective(trial)
+    if(is.finite(value)&&value<base_value-1e-12) {
+      if(value<ans$objective)ans <- list(fit=trial,objective=value,block="Z_tangent")
+      break
+    }
+  }
+  # B proximal and Delta projected-gradient steps keep the score geometry
+  # fixed. The Delta gradient is projected over informative donors only.
+  for(q in seq_len(ncol(d))) {
+    x <- fit$Z*d[,q]
+    lip <- max(eigen(crossprod(x,x*w),symmetric=TRUE,only.values=TRUE)$values,1e-12)
+    grad <- -t(r)%*%(x*w)
+    gd <- array(0,dim(fit$Delta)[1:3]); ld <- 1e-12
+    informative <- logical(length(fit$donors))
+    for(s in seq_along(fit$donors)) {
+      ii <- which(fit$meta$donor==fit$donors[s]); informative[s] <- any(abs(d[ii,q])>0)
+      gd[s,,] <- -t(r[ii,,drop=FALSE])%*%(x[ii,,drop=FALSE]*w[ii])+
+        lambda_Delta/length(fit$donors)*fit$Delta[s,,,q]
+      ld <- max(ld,max(eigen(crossprod(x[ii,,drop=FALSE],x[ii,,drop=FALSE]*w[ii]),
+        symmetric=TRUE,only.values=TRUE)$values)+lambda_Delta/length(fit$donors))
+    }
+    center <- apply(gd[informative,,,drop=FALSE],c(2,3),mean)
+    for(s in which(informative))gd[s,,] <- gd[s,,]-center
+    for(nm in c("B_prox","Delta_projected"))for(a in 0.5^(0:20)) {
+      trial <- fit
+      if(nm=="B_prox")trial$B[,,q] <- .regift_group_soft(fit$B[,,q]-a*grad/lip,a*lambda_B/lip)
+      else trial$Delta[,,,q] <- fit$Delta[,,,q]-a*gd/ld
+      value <- objective(trial)
+      if(is.finite(value)&&value<base_value-1e-12) {
+        if(value<ans$objective)ans <- list(fit=trial,objective=value,block=nm)
+        break
+      }
+    }
+  }
+  # Nuisance-score gradient in the ordinary orthogonal complement required by
+  # Xbio' U = 0. C is held fixed, so this is a feasible U-only step.
+  candidate <- fit
+  for(s in seq_along(fit$donors)) {
+    u <- fit$U[[s]]; cc <- fit$C[[s]]
+    if(!ncol(u)) next
+    ii <- which(fit$meta$donor==fit$donors[s]); z <- fit$Z[ii,,drop=FALSE]
+    xbio <- cbind(d[ii,,drop=FALSE],z,
+      do.call(cbind,lapply(seq_len(ncol(d)),function(q)z*d[ii,q])))
+    sx <- svd(xbio,nu=min(dim(xbio)),nv=0L)
+    basis <- sx$u[,sx$d>max(sx$d)*1e-10,drop=FALSE]
+    gu <- -(r[ii,,drop=FALSE]%*%cc)*w[ii]
+    gu <- gu-basis%*%crossprod(basis,gu)
+    lu <- max(w[ii])*max(eigen(crossprod(cc),symmetric=TRUE,
+      only.values=TRUE)$values,1e-12)
+    candidate$U[[s]] <- u-gu/max(lu,1e-12)
+  }
+  for(a in 0.5^(0:20)) {
+    trial <- fit
+    trial$U <- Map(function(x,y)x+a*(y-x),fit$U,candidate$U)
+    value <- objective(trial)
+    if(is.finite(value)&&value<base_value-1e-12) {
+      if(value<ans$objective)ans <- list(fit=trial,objective=value,block="U_projected")
+      break
+    }
+  }
+  ans
 }
 
 .regift_objective <- function(fit, Y, dcell, lambda_B, lambda_Delta, sigma, kappa) {
@@ -263,6 +508,9 @@
 #' @param state_condition_main Anchor a donor-balanced condition main effect
 #'   within each metadata-defined coarse state, while B retains continuous
 #'   within-state response geometry.
+#' @param state_anchor_shrinkage Apply the frozen r4 conditional donor-jackknife
+#'   shrinkage to state departures. Supported for one-contrast paired or
+#'   unpaired designs; the fit records application status and support diagnostics.
 #' @export
 regift_fit <- function(Y, meta, contrasts, K = 10L, H = 5L,
                        lambda_B = NULL, lambda_Delta = 1,
@@ -275,12 +523,16 @@ regift_fit <- function(Y, meta, contrasts, K = 10L, H = 5L,
                        gene_block = 256L, threads = 1L,
                        svd_backend = c("randomized", "dense"),
                        state_guided_init = TRUE,
-                       state_condition_main = TRUE) {
+                       state_condition_main = TRUE,
+                       state_anchor_shrinkage = TRUE) {
   Y <- as.matrix(Y); storage.mode(Y) <- "double"
   z_backend <- match.arg(z_backend)
   svd_backend <- match.arg(svd_backend)
   meta <- as.data.frame(meta, stringsAsFactors = FALSE)
   .regift_assert(nrow(Y) == nrow(meta), "Y and meta have different cell counts.")
+  if (isTRUE(state_condition_main) && "state" %in% names(meta))
+    .regift_assert(!anyNA(meta$state) && all(nzchar(as.character(meta$state))),
+                   "State anchor labels must be nonmissing and nonempty.")
   design_check <- .regift_check_design(meta, contrasts)
   .regift_assert(design_check$estimable, sprintf(
     "Condition design is nonestimable (singular-value ratio %.3g).", design_check$singular_ratio))
@@ -297,15 +549,25 @@ regift_fit <- function(Y, meta, contrasts, K = 10L, H = 5L,
   w_main0 <- .regift_condition_main_weights(meta, condition_main_strata, huber)
   A0 <- matrix(0, p, qn)
   if (isTRUE(condition_main)) {
-    gram_a0 <- .regift_weighted_crossprod(dcell, dcell, w_main0)
-    A0 <- t(.regift_solve(gram_a0,
-      .regift_weighted_crossprod(dcell, Y, w_main0), ridge))
+    baseline_strata <- .regift_anchor_baseline(meta, state_condition_main)
+    A0 <- t(.regift_condition_slopes(dcell, Y, w_main0, ridge,
+      strata = baseline_strata))
   }
   state_levels <- if (isTRUE(state_condition_main) && "state" %in% names(meta) &&
                        length(unique(meta$state)) > 1L)
     unique(as.character(meta$state)) else character()
   A_state0 <- if (length(state_levels))
     .regift_robust_state_effects(Y, meta, dcell, A0, state_levels, ridge) else NULL
+  .regift_assert(is.logical(state_anchor_shrinkage) &&
+                   length(state_anchor_shrinkage) == 1L && !is.na(state_anchor_shrinkage),
+                 "state_anchor_shrinkage must be TRUE or FALSE.")
+  state_uncertainty <- if (state_anchor_shrinkage)
+    .regift_state_uncertainty(Y, meta, contrasts, A0, A_state0, ridge,
+      condition_main_strata, condition_main) else
+    list(A_state = A_state0, status = "state shrinkage disabled", applied = FALSE)
+  A_state0 <- state_uncertainty$A_state
+  state_anchor_support <- attr(A_state0, "state_anchor_support")
+  if (!is.null(A_state0)) attr(A_state0, "state_anchor_support") <- NULL
   fixed_main0 <- dcell %*% t(A0)
   if (length(state_levels)) {
     proto <- list(A_state = A_state0, state_levels = state_levels,
@@ -327,7 +589,9 @@ regift_fit <- function(Y, meta, contrasts, K = 10L, H = 5L,
               state_levels = state_levels)
   fit <- .regift_normalize(fit)
   a0 <- .regift_sample_rms_blocked(fit, Y, dcell, gene_block)
-  sigma <- max(1.4826 * median(abs(a0 - median(a0))), 1e-6)
+  # RMS residuals are nonnegative magnitudes, not centered signed residuals.
+  # Freeze this training-only scale throughout optimization.
+  sigma <- max(median(a0), 1e-6)
   # The objective uses a mean squared residual within each sample. Therefore
   # cell weights include 1/p, which is essential for putting lambda_B on the
   # lambda_max scale defined by the zero-response gradient.
@@ -351,6 +615,8 @@ regift_fit <- function(Y, meta, contrasts, K = 10L, H = 5L,
   objective <- numeric(max_iter + 1L)
   objective[1L] <- evaluate_objective(fit)
   stable <- 0L
+  fallback_count <- 0L
+  fallback_blocks <- character()
   convergence_reason <- "maximum iterations"
   for (iter in seq_len(max_iter)) {
     previous_fit <- fit
@@ -407,21 +673,11 @@ regift_fit <- function(Y, meta, contrasts, K = 10L, H = 5L,
       }
       rm(partial, gram_a)
     }
-    # Population response updates with group soft thresholding.
-    for (q in seq_len(qn)) {
-      xq <- fit$Z * dcell[, q]
-      gram <- .regift_weighted_crossprod(xq, xq, w)
-      step <- 1 / max(eigen(gram, symmetric = TRUE, only.values = TRUE)$values, ridge)
-      for (genes in .regift_gene_blocks(p, gene_block)) {
-        partial <- Y[, genes, drop = FALSE] - .regift_fitted(fit, dcell, genes)
-        gradient <- -t(partial) %*% (xq * w)
-        current <- matrix(fit$B[genes, , q, drop = FALSE], length(genes), K)
-        fit$B[genes, , q] <- .regift_group_soft(current - step * gradient,
-                                                 lambda_B * step)
-      }
-      rm(partial)
-    }
     # Donor deviations, then exact donor-balanced centering.
+    # Deviations are updated and centered before the population-response
+    # proximal step. Centering transfers the identified donor location into B;
+    # applying group soft thresholding afterwards prevents that transfer from
+    # overwriting structural zeros in the penalized population response.
     for (q in seq_len(qn)) {
       for (s in seq_along(donors)) {
         ii <- which(meta$donor == donors[s])
@@ -440,13 +696,30 @@ regift_fit <- function(Y, meta, contrasts, K = 10L, H = 5L,
         }
         rm(partial, gram_delta)
       }
-      # Robust identification uses the same fixed, truth-blind adaptive donor
-      # location as the state main effect; it is never selected by scenario.
-      center <- apply(fit$Delta[, , , q, drop = FALSE], c(2, 3),
-                      .regift_adaptive_donor_location)
+      # Identification is an equal-donor arithmetic constraint, independent
+      # of robust residual weights. Only donors with nonzero contrast support
+      # enter its mean. Transfer the same center to preserve B + Delta.
+      informative <- vapply(donors, function(s)
+        any(abs(dcell[meta$donor == s, q]) > 0), logical(1))
+      center <- apply(fit$Delta[informative, , , q, drop = FALSE],
+                      c(2, 3), mean)
       fit$B[, , q] <- fit$B[, , q] + center
       for (s in seq_along(donors))
         fit$Delta[s, , , q] <- fit$Delta[s, , , q] - center
+    }
+    # Population response updates with group soft thresholding.
+    for (q in seq_len(qn)) {
+      xq <- fit$Z * dcell[, q]
+      gram <- .regift_weighted_crossprod(xq, xq, w)
+      step <- 1 / max(eigen(gram, symmetric = TRUE, only.values = TRUE)$values, ridge)
+      for (genes in .regift_gene_blocks(p, gene_block)) {
+        partial <- Y[, genes, drop = FALSE] - .regift_fitted(fit, dcell, genes)
+        gradient <- -t(partial) %*% (xq * w)
+        current <- matrix(fit$B[genes, , q, drop = FALSE], length(genes), K)
+        fit$B[genes, , q] <- .regift_group_soft(current - step * gradient,
+                                                 lambda_B * step)
+      }
+      rm(partial)
     }
     # Donor nuisance SVD after projection away from the biological score space.
     if (H) for (s in seq_along(donors)) {
@@ -455,16 +728,21 @@ regift_fit <- function(Y, meta, contrasts, K = 10L, H = 5L,
                     do.call(cbind, lapply(seq_len(qn), function(q)
                       fit$Z[ii, , drop = FALSE] * dcell[ii, q])))
       rr <- Y[ii, , drop = FALSE] - .regift_biological(fit, dcell, rows = ii)
-      biological_coef <- .regift_solve(crossprod(xbio), crossprod(xbio, rr), ridge)
-      rr <- rr - xbio %*% biological_coef
+      sx <- svd(xbio, nu = min(dim(xbio)), nv = 0L)
+      keep <- sx$d > max(sx$d) * 1e-10
+      basis <- sx$u[, keep, drop = FALSE]
+      rr <- rr - basis %*% crossprod(basis, rr)
       ss <- rank_svd(rr, H)
       fit$U[[s]] <- ss$u * sqrt(length(ii))
       fit$C[[s]] <- sweep(ss$v, 2L, ss$d / sqrt(length(ii)), `*`)
     }
+    # Normalization applies an invertible coordinate transform to Z and hence
+    # preserves span(Z,dZ); the existing nuisance orthogonality remains valid.
     fit <- .regift_normalize(fit)
     candidate_fit <- fit
     candidate_objective <- evaluate_objective(candidate_fit)
     stationary_line_search <- FALSE
+    used_fallback <- FALSE
     # The dense reference backend combines several conditional minimizers.
     # A sweep-level line search guarantees the non-increasing objective required
     # by the majorization algorithm, including when finite-precision projections
@@ -482,9 +760,14 @@ regift_fit <- function(Y, meta, contrasts, K = 10L, H = 5L,
         }
       }
       if (!accepted) {
-        fit <- previous_fit
-        candidate_objective <- previous_objective
-        stationary_line_search <- TRUE
+        rescue <- .regift_constrained_rescue(previous_fit, Y, dcell,
+          sigma, kappa, evaluate_objective, lambda_B, lambda_Delta, gene_block)
+        fit <- rescue$fit
+        candidate_objective <- rescue$objective
+        used_fallback <- rescue$block != "none"
+        fallback_count <- fallback_count + as.integer(used_fallback)
+        if (used_fallback) fallback_blocks <- c(fallback_blocks, rescue$block)
+        stationary_line_search <- !used_fallback
       }
     }
     amag <- .regift_sample_rms_blocked(fit, Y, dcell, gene_block)
@@ -494,13 +777,19 @@ regift_fit <- function(Y, meta, contrasts, K = 10L, H = 5L,
     if (verbose) message(sprintf("iteration %d objective %.8g relative %.3g", iter,
                                  objective[iter + 1L], rel))
     if (stationary_line_search) {
-      stable <- 5L
-      convergence_reason <- "line-search stationary point"
+      stable <- 0L
+      convergence_reason <- "rejected direction; stationarity unverified"
       break
     }
+    # A rescue evaluates every fitted block (A/A_state are fixed anchors).
+    # Its accepted decrease can therefore use the same practical objective
+    # tolerance as a full sweep. This is coordinatewise convergence, not a
+    # first-order stationarity certificate.
     stable <- if (rel < tol) stable + 1L else 0L
     if (stable >= 5L) {
-      convergence_reason <- "relative objective tolerance"
+      convergence_reason <- if (used_fallback)
+        "blockwise relative objective tolerance" else
+        "relative objective tolerance"
       break
     }
   }
@@ -508,6 +797,9 @@ regift_fit <- function(Y, meta, contrasts, K = 10L, H = 5L,
   fit$iterations <- iter
   fit$converged <- stable >= 5L
   fit$convergence_reason <- convergence_reason
+  fit$fallback_count <- fallback_count
+  fit$fallback_blocks <- fallback_blocks
+  fit$stationarity_verified <- FALSE
   fit$huber_weights <- huber
   fit$sigma <- sigma
   fit$lambda_B <- lambda_B
@@ -522,7 +814,11 @@ regift_fit <- function(Y, meta, contrasts, K = 10L, H = 5L,
   fit$svd_backend <- svd_backend
   fit$state_guided_init <- isTRUE(state_guided_init)
   fit$state_condition_main <- length(state_levels) > 0L
+  fit$state_anchor_support <- state_anchor_support
+  fit$anchor_baseline_model <- if (.regift_anchor_is_paired(meta)) "within-donor" else "between-donor"
   fit$response_reliability <- .regift_response_reliability(Y, meta, dcell)
+  fit$state_anchor_uncertainty <- state_uncertainty
+  fit$state_anchor_shrinkage <- state_anchor_shrinkage
   fit$call <- match.call()
   class(fit) <- "regift_fit"
   fit
@@ -559,6 +855,7 @@ regift_predict_response <- function(object) {
       object$Z %*% t(bq)
     if (!legacy_without_main && !is.null(object$A_state)) for (h in seq_along(object$state_levels)) {
       ii <- which(object$meta$state == object$state_levels[h])
+      if (!length(ii)) next
       out[ii, ] <- out[ii, , drop = FALSE] +
         matrix(object$A_state[, q, h], length(ii), nrow(object$L0), byrow = TRUE)
     }

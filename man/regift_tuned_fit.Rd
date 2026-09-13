@@ -21,7 +21,8 @@ regift_tuned_fit(
 
 \item{tune_args}{Arguments passed to [regift_tune()].}
 
-\item{fit_args}{Additional arguments passed to the final [regift_fit()].}
+\item{fit_args}{Fixed settings shared by tuning, probes and final fitting.
+max_iter is the final budget; tune_args controls the inner budget.}
 }
 \value{
 Working response, tuning object and final fit.

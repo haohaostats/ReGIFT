@@ -10,6 +10,32 @@ across biological replicates while separating donor-specific deviations and
 technical variation. Performance-critical updates are implemented in C++ via
 Rcpp and run on CPU; a GPU is not required.
 
+## Frozen analysis version
+
+**Version 0.1.0 packages the final ReGIFT r4 estimator frozen on 2026-09-09.**
+It combines the 0.0.1.9007 base estimator with conditional donor-jackknife
+shrinkage of state departures. The complete predicted response is
+`gamma_q * (condition_anchor + shrunken_state_departure + latent_response)`.
+Normal package calls apply this estimator; no external adapter is required.
+
+`regift()` defaults to K=5, H=2, lambda_fraction=1/32, lambda_Delta=3,
+max_iter=100 and tol=1e-6. Supply K=10 for the manuscript HPAP analysis.
+An unshrunk one-sweep base fit determines the maximum group penalty before
+the final shrunk fit. The low-level `regift_fit()` retains its original
+explicit parameter controls and legacy automatic penalty fallback; use
+`regift()` for the manuscript preset, or pass the frozen parameters explicitly.
+Reproducing a particular figure also requires its original cohort selection,
+features, working transformation and donor folds.
+
+State shrinkage uses supplied `state` labels and supports one contrast in a
+purely paired or purely unpaired design. Multiple contrasts, mixed pairing,
+insufficient donors and unavailable global deletion fits retain base anchors.
+States losing deletion support borrow the common anchor when a prior variance
+can be estimated. Inspect `fit$fit$state_anchor_uncertainty` for application
+status, variance, weights and support diagnostics. These are conditional
+point-estimation diagnostics; donor-level test intervals use cross-fitted
+donor scores through the separate inference API.
+
 ## Features
 
 - Recovers condition programs shared across biological donors.
@@ -19,12 +45,12 @@ Rcpp and run on CPU; a GPU is not required.
 
 ## Installation
 
-Install the development release from GitHub with:
+Install the frozen release from GitHub with:
 
 ```r
 if (!requireNamespace("remotes", quietly = TRUE))
   install.packages("remotes")
-remotes::install_github("haohaostats/ReGIFT")
+remotes::install_github("haohaostats/ReGIFT@v0.1.0")
 ```
 
 A local source checkout can be installed with:
@@ -48,7 +74,7 @@ fit <- regift(
   state = "state",
   reference = "control",
   threads = 4,
-  max_iter = 20
+  max_iter = 100
 )
 
 fit
@@ -66,7 +92,8 @@ conditions. A coarse state annotation is optional.
 ## Web application
 
 Use the [ReGIFT web application](https://01a05bda-7ce0-7fc5-2085-edb0113e15eb.share.connect.posit.cloud/)
-to run the same analysis through a browser-based interface.
+for the browser interface. Its deployment is versioned independently; use
+the tagged R package above for the frozen r4 estimator.
 
 ## License
 

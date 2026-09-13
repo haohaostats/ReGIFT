@@ -58,7 +58,7 @@ regift_crossfit_scores <- function(counts, meta, contrasts, fit_args = list()) {
       probe_args <- args
       probe_args$lambda_B <- 0
       probe_args$max_iter <- 1L
-      probe <- do.call(regift_fit, c(list(Y = wr$Y, meta = train_meta,
+      probe <- do.call(.regift_penalty_probe, c(list(Y = wr$Y, meta = train_meta,
                                          contrasts = contrasts), probe_args))
       args$lambda_B <- probe$lambda_B_max * fraction
     }
@@ -95,6 +95,35 @@ regift_crossfit_scores <- function(counts, meta, contrasts, fit_args = list()) {
   }
 }
 
+.regift_incomplete_cluster_score <- function(object, q) {
+  inc <- object$incidence
+  ids <- which(rowSums(inc) > 0L)
+  cells <- which(inc[ids, , drop = FALSE], arr.ind = TRUE)
+  S <- length(ids); A <- ncol(inc); p <- dim(object$values)[2L]
+  donor <- cells[, 1L]; arm <- cells[, 2L]
+  # Donor intercepts and A-1 condition indicators; every observed arm enters.
+  X <- cbind(diag(S)[donor, , drop = FALSE],
+             diag(A)[arm, -1L, drop = FALSE])
+  w <- 1 / as.numeric(table(factor(donor, levels = seq_len(S))))[donor]
+  .regift_assert(qr(X * sqrt(w))$rank == ncol(X),
+    "Incomplete-block donor-condition graph is disconnected: contrast not estimable.")
+  .regift_assert(nrow(X) > ncol(X),
+    "Incomplete-block design has no residual degrees of freedom for inference.")
+  Y <- t(vapply(seq_len(nrow(cells)), function(j)
+    object$values[ids[donor[j]], , arm[j]], numeric(p)))
+  .regift_assert(all(is.finite(Y)), "Observed cluster scores must be finite.")
+  bread <- solve(crossprod(X, X * w))
+  beta <- bread %*% crossprod(X, Y * w)
+  cvec <- c(rep(0, S), object$contrasts[q, -1L])
+  .regift_assert(abs(sum(object$contrasts[q, ])) < 1e-8,
+    "Incomplete-block inference requires zero-sum condition contrasts.")
+  residual <- Y - X %*% beta
+  leverage <- as.vector(X %*% bread %*% cvec) * w
+  influence <- S * rowsum(residual * leverage, donor, reorder = TRUE)
+  list(estimate = as.vector(crossprod(cvec, beta)), influence = influence,
+       cluster_count = S)
+}
+
 #' Donor-level multiplier inference for cross-fitted ReGIFT responses
 #'
 #' @param object Output from regift_crossfit_scores.
@@ -115,7 +144,14 @@ regift_infer <- function(object, n_multiplier = 10000L, seed = 20260829L,
     active <- which(object$contrasts[q, ] != 0)
     eligible <- which(rowSums(object$incidence[, active, drop = FALSE]) == length(active))
     paired_q <- length(eligible) >= 2L
-    if (paired_q) {
+    incomplete <- any(rowSums(object$incidence) > 1L) &&
+      !all(object$incidence)
+    if (incomplete) {
+      score <- .regift_incomplete_cluster_score(object, q)
+      estimate <- score$estimate; influence <- score$influence
+      cluster_count <- score$cluster_count
+      paired_q <- FALSE
+    } else if (paired_q) {
       th <- matrix(0, length(eligible), p)
       for (a in active)
         th <- th + object$contrasts[q, a] * values[eligible, , a, drop = FALSE][, , 1L]
@@ -130,6 +166,8 @@ regift_infer <- function(object, n_multiplier = 10000L, seed = 20260829L,
       influence <- matrix(0, cluster_count, p)
       for (a in active) {
         pos <- which(object$incidence[observed, a])
+        .regift_assert(length(pos) >= 2L,
+                       "Each unpaired condition arm requires at least two donors.")
         ya <- values[observed[pos], , a, drop = FALSE][, , 1L]
         arm_mean <- colMeans(ya)
         estimate <- estimate + object$contrasts[q, a] * arm_mean
@@ -142,7 +180,7 @@ regift_infer <- function(object, n_multiplier = 10000L, seed = 20260829L,
     observed_stat <- sqrt(cluster_count) * estimate / sigma
     use_exact <- exact && paired_q && cluster_count <= 12L
     xi <- .regift_exact_or_random_signs(cluster_count, use_exact, n_multiplier,
-                                        seed + q - 1L)
+                                        seed)
     boot_num <- crossprod(xi, influence) / sqrt(cluster_count)
     # Re-studentize every multiplier draw. With few biological replicates a
     # fixed plug-in denominator gives a visibly light-tailed reference law.
@@ -151,18 +189,24 @@ regift_infer <- function(object, n_multiplier = 10000L, seed = 20260829L,
     boot_sigma <- sqrt(pmax((sumsq - boot_num^2) /
                               pmax(cluster_count - 1L, 1L), 1e-16))
     boot <- boot_num / boot_sigma
-    pval <- (1 + colSums(abs(boot) >= matrix(abs(observed_stat), nrow(boot), p,
-                                             byrow = TRUE))) / (nrow(boot) + 1)
+    exceed <- colSums(abs(boot) >= matrix(abs(observed_stat), nrow(boot), p,
+                                         byrow = TRUE))
+    pval <- if (use_exact) exceed / nrow(boot) else
+      (1 + exceed) / (nrow(boot) + 1)
     qlo <- apply(boot, 2L, stats::quantile, probs = .025, names = FALSE)
     qhi <- apply(boot, 2L, stats::quantile, probs = .975, names = FALSE)
     se <- sigma / sqrt(cluster_count)
     ans[[q]] <- data.frame(
       contrast = rownames(object$contrasts)[q], gene = dimnames(values)[[2L]],
-      estimate = estimate, statistic = observed_stat, p_value = pval,
+      estimate = estimate, standard_error = se,
+      statistic = observed_stat, p_value = pval,
       q_value = .regift_bh(pval), ci_low = estimate - qhi * se,
       ci_high = estimate - qlo * se, donors = cluster_count,
       multiplier = if (use_exact) "exact sign enumeration" else "Rademacher multiplier",
       stringsAsFactors = FALSE)
   }
-  do.call(rbind, ans)
+  result <- do.call(rbind, ans)
+  result$q_value <- .regift_bh(result$p_value)
+  attr(result, "fdr_family") <- "all gene-contrast tests in this call"
+  result
 }

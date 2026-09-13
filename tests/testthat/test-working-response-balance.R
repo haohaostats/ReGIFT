@@ -12,3 +12,21 @@ test_that("working-response exposure reference is donor balanced", {
                tolerance = 1e-12)
   expect_equal(base$rate, duplicated$rate, tolerance = 1e-12)
 })
+
+test_that("working representation is invariant to unequal-donor row order", {
+  set.seed(9274001)
+  counts <- matrix(rpois(120,10),6,20)
+  meta <- data.frame(donor=c("B","B","A","A","A","A"),
+    sample=c("B0","B1","A0","A0","A1","A1"),
+    condition=c("C0","C1","C0","C0","C1","C1"))
+  a <- regift_working_response(counts,meta)
+  order <- c(3:6,1:2)
+  b <- regift_working_response(counts[order,],meta[order,])
+  expect_equal(a$library_geomean,b$library_geomean,tolerance=1e-12)
+  expect_equal(a$rate,b$rate,tolerance=1e-12)
+  expect_equal(a$Y[order,],b$Y,tolerance=1e-12)
+  expect_equal(a$phi,b$phi,tolerance=1e-12)
+  expected_geomean <- exp(mean(c(mean(log(rowSums(counts)[1:2])),
+    mean(log(rowSums(counts)[3:6])))))
+  expect_equal(a$library_geomean,expected_geomean,tolerance=1e-12)
+})

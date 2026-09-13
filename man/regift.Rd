@@ -13,7 +13,7 @@ regift(
   state = NULL,
   reference = NULL,
   K = 5L,
-  H = 5L,
+  H = 2L,
   lambda_fraction = 1/32,
   lambda_Delta = 3,
   max_iter = 100L,
@@ -39,7 +39,7 @@ condition is used.}
 
 \item{K}{Shared biological rank. The frozen default is 5.}
 
-\item{H}{Donor-specific nuisance rank.}
+\item{H}{Donor-specific nuisance rank. The frozen preset is 2.}
 
 \item{lambda_fraction}{Fraction of the data-derived maximum group penalty.}
 
@@ -63,7 +63,8 @@ A `regift_analysis` object containing the standardized metadata,
 `regift()` is the primary user-facing entry point. It validates cell
 metadata, constructs reference-versus-condition contrasts, computes the
 count-aware working response, calibrates the frozen group penalty, and fits
-the ReGIFT model.
+the frozen r4 ReGIFT estimator, including conditional state-deviation shrinkage.
+Supply coarse state labels to enable state-specific anchors and shrinkage.
 }
 \examples{
 data(regift_example)

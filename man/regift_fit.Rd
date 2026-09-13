@@ -25,7 +25,8 @@ regift_fit(
   threads = 1L,
   svd_backend = c("randomized", "dense"),
   state_guided_init = TRUE,
-  state_condition_main = TRUE
+  state_condition_main = TRUE,
+  state_anchor_shrinkage = TRUE
 )
 }
 \arguments{
@@ -78,6 +79,10 @@ the balanced initialization before alternating optimization.}
 \item{state_condition_main}{Anchor a donor-balanced condition main effect
 within each metadata-defined coarse state, while B retains continuous
 within-state response geometry.}
+
+\item{state_anchor_shrinkage}{Apply the frozen r4 conditional donor-jackknife
+shrinkage to state departures. Supported for one-contrast paired or
+unpaired designs; the fit records application status and support diagnostics.}
 }
 \description{
 Fits the replicate-guided factorization using compiled, gene-blocked updates

@@ -1,7 +1,7 @@
 Package: ReGIFT
 Type: Package
 Title: Replicate-Guided Matrix Factorization for Single-Cell Transcriptomics
-Version: 0.0.1
+Version: 0.1.0
 Authors@R: person("ReGIFT", "Development Team", role = c("aut", "cre"),
     email = "haohaostats@users.noreply.github.com")
 Description: Fits interpretable replicate-guided matrix factorization models

@@ -10,8 +10,16 @@ ReGIFT estimates condition-response programs that generalize across
 biological replicates while separating donor-specific deviations and
 technical variation. Use [regift()] for the standard user workflow.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/haohaostats/ReGIFT}
+  \item Report bugs at \url{https://github.com/haohaostats/ReGIFT/issues}
+}
+
+}
 \author{
-\strong{Maintainer}: ReGIFT Development Team \email{regift@example.org}
+\strong{Maintainer}: ReGIFT Development Team \email{haohaostats@users.noreply.github.com}
 
 }
 \keyword{internal}

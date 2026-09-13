@@ -3,7 +3,8 @@
 #' `regift()` is the primary user-facing entry point. It validates cell
 #' metadata, constructs reference-versus-condition contrasts, computes the
 #' count-aware working response, calibrates the frozen group penalty, and fits
-#' the ReGIFT model.
+#' the frozen r4 ReGIFT estimator, including conditional state-deviation shrinkage.
+#' Supply coarse state labels to enable state-specific anchors and shrinkage.
 #'
 #' @param counts Cell-by-gene matrix of non-negative integer counts. Dense
 #'   matrices and `Matrix` sparse matrices are accepted.
@@ -14,7 +15,7 @@
 #' @param reference Reference condition. If `NULL`, the first observed
 #'   condition is used.
 #' @param K Shared biological rank. The frozen default is 5.
-#' @param H Donor-specific nuisance rank.
+#' @param H Donor-specific nuisance rank. The frozen preset is 2.
 #' @param lambda_fraction Fraction of the data-derived maximum group penalty.
 #' @param lambda_Delta Ridge penalty for donor-specific response deviations.
 #' @param max_iter Maximum fitting sweeps.
@@ -33,7 +34,7 @@
 #' @export
 regift <- function(counts, meta, donor = "donor", sample = "sample",
                    condition = "condition", state = NULL, reference = NULL,
-                   K = 5L, H = 5L, lambda_fraction = 1 / 32,
+                   K = 5L, H = 2L, lambda_fraction = 1 / 32,
                    lambda_Delta = 3, max_iter = 100L, tol = 1e-6,
                    threads = 1L, gene_block = 256L, verbose = FALSE) {
   .regift_assert(is.matrix(counts) || inherits(counts, "Matrix"),
@@ -91,7 +92,7 @@ regift <- function(counts, meta, donor = "donor", sample = "sample",
   probe_args <- common_args
   probe_args$lambda_B <- 0
   probe_args$max_iter <- 1L
-  probe <- do.call(regift_fit, probe_args)
+  probe <- do.call(.regift_penalty_probe, probe_args)
   common_args$lambda_B <- probe$lambda_B_max * lambda_fraction
   common_args$max_iter <- as.integer(max_iter)
   common_args$tol <- tol

@@ -22,15 +22,18 @@ test_that("randomized SVD exactly recovers a low-rank matrix", {
   expect_identical(a,b)
 })
 
-test_that("a rejected safeguarded sweep terminates at the same fixed point", {
+test_that("a rejected safeguarded sweep does not assert stationarity", {
   sim<-regift_simulate(A=2,S=3,p=24,cells=10,K0=2,H=1,seed=1804)
   wr<-regift_working_response(sim$counts,sim$meta)
   fit<-regift_fit(wr$Y,sim$meta,sim$contrasts,K=2,H=1,lambda_B=0,
     lambda_Delta=1,max_iter=30,tol=1e-8)
   expect_true(all(diff(fit$objective)<=1e-10))
   expect_true(fit$convergence_reason %in%
-    c("line-search stationary point","relative objective tolerance",
+    c("rejected direction; stationarity unverified","relative objective tolerance",
+      "blockwise relative objective tolerance",
       "maximum iterations"))
+  expect_false(fit$stationarity_verified)
+  if (grepl("rejected", fit$convergence_reason)) expect_false(fit$converged)
 })
 
 test_that("blocked objective and on-demand components match dense definitions", {

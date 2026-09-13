@@ -1,0 +1,25 @@
+{
+  "release": "0.1.0",
+  "model": "r4",
+  "frozen_date": "2026-09-09",
+  "base_version": "0.0.1.9007",
+  "source_sha256": {
+    "R/data.R": "734f536dcf8f581acbe9074c95d8ecb54bd4645705102577e8a98925b6ffc79d",
+    "R/design.R": "cd106eae1f423c8e151a9c1ef55e43079572f860126b0569739064bffbbb2c68",
+    "R/fit.R": "9c4a953d407ba5d860086cc2b0ffd22dd410c54c3398dc29a5547ef87d8740b4",
+    "R/inference.R": "f7914234dc8d202b3d7ad351fe8bb04faeb8eea623db26a1c6e7fc8808d1f43c",
+    "R/lodo.R": "45d931b48a5bcd66309c3bc7777a897b1326cd53a124cd02369e9e841ae4d52d",
+    "R/metrics.R": "b7bd91e31a732f11478fbf9915e8134bff6163852c41816c2b8448cdd58f6909",
+    "R/RcppExports.R": "3741fdae9eff4dbfe45ed59fdd19390b88086eba08d3bc148ea102f6668717b5",
+    "R/ReGIFT-package.R": "6b5e92a446170b9951d8e1da81f293e78b4fcaf06ff1c927002b9edb65c04380",
+    "R/regift.R": "c6f861c1d70d4551c6ce3248d75e2c908178f825c149ad37a1ab40aaf89a6c0e",
+    "R/simulate.R": "7ad4e2daac39da4395698b831917c5dc6e7b63c29c622d151afae14b10c0c2c4",
+    "R/tune.R": "3c111b24df13992137ae0cc71feebda165b6c9ed81ede57684bb27bc1472a301",
+    "R/tuned_fit.R": "25ce3aebc6af8225996200e3dc5fd97c53319ea5b1d6a80884922f430f85deda",
+    "R/utils.R": "ac4b32314aba0d9c323c317bdc38606f10138866053a733e94949019f5d8cb33",
+    "R/working_response.R": "e191cdada19a2aa8b8383b71595c77b7fe1b1538424b15d032e3d3e8b60e7f55"
+  },
+  "adapter_sha256": "6b0af88f19f2c1c8ffcd05aa58612df786a2ca0fb31bf34448bdab1bef754cbe",
+  "frozen_adapter_raw_sha256": "6b0af88f19f2c1c8ffcd05aa58612df786a2ca0fb31bf34448bdab1bef754cbe",
+  "upstream_before": "a7fe4827608e0d7931c81cb26a9f42bd97947f01"
+}

@@ -22,12 +22,15 @@ regift_working_response <- function(counts, meta, clip = TRUE) {
   # alter every Pearson residual before replicate-normalized weights are
   # applied. Average log-library sizes within donor first, then across donors.
   donor <- factor(meta$donor)
-  donor_log_library <- rowsum(log(lib), donor, reorder = FALSE) /
-    as.numeric(table(donor))
+  donor_log_sum <- rowsum(log(lib), donor, reorder = FALSE)
+  donor_sizes <- table(donor)
+  donor_log_library <- donor_log_sum /
+    as.numeric(donor_sizes[rownames(donor_log_sum)])
   gmean <- exp(mean(donor_log_library))
   exposure <- lib / gmean
-  donor_rates <- rowsum(counts / exposure, donor, reorder = FALSE) /
-    as.numeric(table(donor))
+  donor_rate_sum <- rowsum(counts / exposure, donor, reorder = FALSE)
+  donor_rates <- donor_rate_sum /
+    as.numeric(donor_sizes[rownames(donor_rate_sum)])
   rate <- colMeans(donor_rates)
   mu <- exposure %o% pmax(rate, 1e-8)
   # Donor-balanced method-of-moments dispersion, stabilized by a global trend.

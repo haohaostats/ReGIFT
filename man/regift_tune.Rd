@@ -14,7 +14,8 @@ regift_tune(
   H = 10L,
   max_folds = 5L,
   max_iter = 100L,
-  verbose = FALSE
+  verbose = FALSE,
+  fit_args = list()
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ regift_tune(
 \item{max_iter}{Fitting sweeps per candidate.}
 
 \item{verbose}{Print progress while evaluating candidates.}
+
+\item{fit_args}{Fixed model settings shared by inner fits and lambda probes.}
 }
 \value{
 Selected hyperparameters and all fold-level scores.

@@ -1,3 +1,29 @@
+.regift_validate_fixed_fit_args <- function(fit_args, n_cells, final = FALSE) {
+  .regift_assert(is.list(fit_args), "fit_args must be a named list.")
+  if (length(fit_args)) {
+    nm <- names(fit_args)
+    .regift_assert(!is.null(nm) && !anyNA(nm) && all(nzchar(nm)) &&
+      !anyDuplicated(nm), "fit_args must have unique nonempty names.")
+    controlled <- c("Y", "meta", "contrasts", "K", "H", "lambda_B", "lambda_Delta")
+    if (!final) controlled <- c(controlled, "max_iter")
+    .regift_assert(!any(nm %in% controlled),
+      "fit_args must not replace data, selected parameters or the inner max_iter budget.")
+    .regift_assert(all(nm %in% names(formals(regift_fit))),
+      "fit_args contains an unknown regift_fit argument.")
+  }
+  strata <- fit_args$condition_main_strata
+  if (!is.null(strata) && length(strata) && !is.character(strata))
+    .regift_assert(is.null(dim(strata)) && length(strata) == n_cells,
+      "Non-character condition_main_strata must have one value per input cell.")
+  fit_args
+}
+.regift_subset_fixed_fit_args <- function(fit_args, rows) {
+  strata <- fit_args$condition_main_strata
+  if (!is.null(strata) && length(strata) && !is.character(strata))
+    fit_args$condition_main_strata <- strata[rows]
+  fit_args
+}
+
 .regift_make_folds <- function(meta, max_folds = 5L) {
   sm <- meta[!duplicated(meta$sample), c("donor", "condition"), drop = FALSE]
   incidence <- table(sm$donor, sm$condition) > 0
@@ -67,14 +93,17 @@
 #' @param max_folds Maximum grouped folds.
 #' @param max_iter Fitting sweeps per candidate.
 #' @param verbose Print progress while evaluating candidates.
+#' @param fit_args Fixed model settings shared by inner fits and lambda probes.
 #' @return Selected hyperparameters and all fold-level scores.
 #' @export
 regift_tune <- function(counts, meta, contrasts,
                         K_grid = c(10L, 20L, 30L, 40L),
                         lambda_fractions = c(1, 1/2, 1/4, 1/8, 1/16, 1/32),
                         lambda_Delta_grid = c(.1, .3, 1, 3), H = 10L,
-                        max_folds = 5L, max_iter = 100L, verbose = FALSE) {
+                        max_folds = 5L, max_iter = 100L, verbose = FALSE, fit_args = list()) {
+  fit_args <- .regift_validate_fixed_fit_args(fit_args, nrow(meta))
   fold_info <- .regift_make_folds(meta, max_folds)
+  fold_fit_args <- vector("list", fold_info$V)
   grid <- expand.grid(K = unique(as.integer(K_grid)),
                       lambda_fraction = unique(as.numeric(lambda_fractions)),
                       lambda_Delta = unique(as.numeric(lambda_Delta_grid)),
@@ -84,6 +113,8 @@ regift_tune <- function(counts, meta, contrasts,
   for (v in seq_len(fold_info$V)) {
     test_donors <- names(fold_info$fold)[fold_info$fold == v]
     test <- meta$donor %in% test_donors
+    fixed <- .regift_subset_fixed_fit_args(fit_args, which(!test))
+    fold_fit_args[[v]] <- fixed
     wr <- regift_working_response(counts[!test, , drop = FALSE], meta[!test, , drop = FALSE])
     wr_test <- .regift_apply_working_response(counts[test, , drop = FALSE], wr)
     empirical <- .regift_empirical_contrast(wr_test$Y, meta[test, , drop = FALSE],
@@ -92,17 +123,19 @@ regift_tune <- function(counts, meta, contrasts,
     lambda_cache <- list()
     for (j in seq_len(nrow(grid))) {
       # A one-sweep zero-penalty fit supplies the fold-specific lambda maximum.
-      cache_key <- as.character(grid$K[j])
+      cache_key <- paste(grid$K[j], grid$lambda_Delta[j], sep = "/")
       if (is.null(lambda_cache[[cache_key]])) {
-        probe <- regift_fit(wr$Y, meta[!test, , drop = FALSE], contrasts,
-                            K = grid$K[j], H = H, lambda_B = 0,
-                            lambda_Delta = grid$lambda_Delta[j], max_iter = 1L)
+        probe <- do.call(.regift_penalty_probe, c(list(Y = wr$Y,
+          meta = meta[!test, , drop = FALSE], contrasts = contrasts,
+          K = grid$K[j], H = H, lambda_B = 0,
+          lambda_Delta = grid$lambda_Delta[j], max_iter = 1L), fixed))
         lambda_cache[[cache_key]] <- probe$lambda_B_max
       }
       lambda_B <- lambda_cache[[cache_key]] * grid$lambda_fraction[j]
-      fit <- regift_fit(wr$Y, meta[!test, , drop = FALSE], contrasts,
-                        K = grid$K[j], H = H, lambda_B = lambda_B,
-                        lambda_Delta = grid$lambda_Delta[j], max_iter = max_iter)
+      fit <- do.call(regift_fit, c(list(Y = wr$Y,
+        meta = meta[!test, , drop = FALSE], contrasts = contrasts,
+        K = grid$K[j], H = H, lambda_B = lambda_B,
+        lambda_Delta = grid$lambda_Delta[j], max_iter = max_iter), fixed))
       pr <- regift_project(wr_test$Y, meta[test, , drop = FALSE], fit)
       erec <- mean((wr_test$Y - pr$fitted)^2)
       estate <- attr(empirical, "state")
@@ -143,5 +176,6 @@ regift_tune <- function(counts, meta, contrasts,
                                  -candidates$lambda_fraction), , drop = FALSE]
   selected <- candidates[1L, , drop = FALSE]
   list(selected = selected, aggregate = agg, fold_scores = scores,
-       folds = fold_info, grid = grid)
+       folds = fold_info, grid = grid, fixed_fit_args = fit_args,
+       fold_fit_args = fold_fit_args, inner_max_iter = max_iter)
 }

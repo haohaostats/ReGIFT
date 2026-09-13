@@ -21,6 +21,8 @@ test_that("held-out population responses include the learned condition main effe
                     lambda_B = 0, max_iter = 2)
   fit$A[, 1] <- seq(-0.5, 0.5, length.out = 24)
   fit$B[, , 1] <- 0
+  fit$A_state <- NULL
+  fit$response_reliability <- 1
   wr_test <- ReGIFT:::.regift_apply_working_response(sim$counts[!keep, ], wr)
   pr <- regift_project(wr_test$Y, sim$meta[!keep, ], fit, max_iter = 2)
   expected <- matrix(fit$A[, 1], sum(!keep), 24, byrow = TRUE)
