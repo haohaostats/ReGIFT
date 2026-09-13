@@ -63,11 +63,6 @@ conditions. Supply `state` labels for state-specific responses. State-specific
 shrinkage is available for two-condition paired or unpaired designs.
 See `?regift` for input requirements and optional parameters.
 
-## Web application
-
-Use the [ReGIFT web application](https://01a05bda-7ce0-7fc5-2085-edb0113e15eb.share.connect.posit.cloud/)
-for browser-based analysis. The R package and web application have separate releases.
-
 ## License
 
 ReGIFT is released under the MIT License.
