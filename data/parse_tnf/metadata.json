@@ -1,11 +1,81 @@
 {
   "dataset": "parse_tnf",
-  "cells": 2400,
-  "genes": 240,
   "donors": 12,
-  "states": ["B Naive", "CD14 Mono", "CD4 Memory", "NK"],
-  "conditions": ["TNF", "control"],
-  "bytes": 307388,
   "source": "Parse Biosciences, 10 Million Human PBMCs in a Single Experiment; https://www.parsebiosciences.com/datasets/10-million-human-pbmcs-in-a-single-experiment/",
-  "license": "CC-BY-NC-4.0"
+  "license": "CC-BY-NC-4.0",
+  "scope": "Complete training inputs for twelve donor folds",
+  "files": [
+    {
+      "name": "fold_01.rds",
+      "cells": 23632,
+      "genes": 320,
+      "bytes": 14234034
+    },
+    {
+      "name": "fold_02.rds",
+      "cells": 23637,
+      "genes": 320,
+      "bytes": 14339040
+    },
+    {
+      "name": "fold_03.rds",
+      "cells": 23722,
+      "genes": 320,
+      "bytes": 14312619
+    },
+    {
+      "name": "fold_04.rds",
+      "cells": 23882,
+      "genes": 320,
+      "bytes": 14523290
+    },
+    {
+      "name": "fold_05.rds",
+      "cells": 23663,
+      "genes": 320,
+      "bytes": 14402701
+    },
+    {
+      "name": "fold_06.rds",
+      "cells": 23641,
+      "genes": 320,
+      "bytes": 14287843
+    },
+    {
+      "name": "fold_07.rds",
+      "cells": 23849,
+      "genes": 320,
+      "bytes": 14450526
+    },
+    {
+      "name": "fold_08.rds",
+      "cells": 23678,
+      "genes": 320,
+      "bytes": 14359584
+    },
+    {
+      "name": "fold_09.rds",
+      "cells": 23760,
+      "genes": 320,
+      "bytes": 14455913
+    },
+    {
+      "name": "fold_10.rds",
+      "cells": 23718,
+      "genes": 320,
+      "bytes": 14330106
+    },
+    {
+      "name": "fold_11.rds",
+      "cells": 23740,
+      "genes": 320,
+      "bytes": 14456404
+    },
+    {
+      "name": "fold_12.rds",
+      "cells": 23670,
+      "genes": 320,
+      "bytes": 14409682
+    }
+  ]
 }

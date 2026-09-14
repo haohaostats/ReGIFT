@@ -65,7 +65,7 @@ See `?regift` for input requirements and optional parameters.
 
 ## Data
 
-Small real-data inputs for IFN-beta PBMC responses, TNF-alpha PBMC responses,
+Complete fitting inputs for IFN-beta PBMC responses, TNF-alpha PBMC responses,
 and pancreatic T1D responses are available in [data/](data/README.md), with
 loading instructions and dataset-specific licenses.
 

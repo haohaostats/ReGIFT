@@ -1,27 +1,32 @@
 # kang_ifnb
 
-1,593 cells, 240 genes, 8 donors, and four cell states.
+24,673 cells and 3,000 genes from eight donors; the complete full-data fitting matrix.
 
-Conditions: IFNB, control. States: B cells, CD14+ Monocytes, CD4 T cells, NK cells.
+## Run ReGIFT
 
-## Use with ReGIFT
-
-Run from the repository root after installing ReGIFT:
+Install ReGIFT 0.1.0 and run from the repository root:
 
 ```r
 library(ReGIFT)
+source("data/fit_input.R")
 x <- readRDS("data/kang_ifnb/input.rds")
-set.seed(20260914)
-fit <- regift(counts = x$counts, meta = x$meta, donor = "donor",
-              sample = "sample", condition = "condition", state = "state",
-              reference = x$reference, threads = 2, max_iter = 100)
-head(regift_response_table(fit))
+fit <- fit_regift_input(x, dataset = "kang_ifnb")
+response <- regift_predict_response(fit)
 ```
 
-`input.rds` contains cells-by-genes sparse integer `counts`, aligned `meta`, `genes`, `contrasts`, `reference`, and `provenance`. The metadata contains only cell, donor, sample, condition, and state. `regift()` constructs its working response from these counts.
+`counts` is a cells-by-genes sparse count matrix. `meta` retains the donor,
+sample, condition, state, and available cell identifiers. `genes` gives the
+column order; `contrasts` gives the original condition contrast.
+The loader applies the original fitting settings and working-response rules.
 
-## Preparation and source
+## Scope
 
-Up to 25 cells per donor-condition-state were selected at evenly spaced positions after sorting source cell identifiers. Four cell states were retained. Within the available selected-gene input, 240 genes were selected by pooled variance of log1p counts normalized to 10,000 counts per cell. Cells with zero counts across selected genes were removed. Count values were preserved.
+These are complete inputs for the fits described above. Kang and HPAP contain
+the full-data matrices, rather than their separately selected validation folds.
+Parse contains training folds. Held-out evaluation matrices, evaluation targets,
+and scoring workflows are not included. Numerical results also depend on the
+software environment and random-number implementation.
 
-Kang et al. (2018), doi:10.1038/nbt.4042; GSE96583; SingleCellExperiment conversion doi:10.5281/zenodo.10069528. [Source data](https://zenodo.org/records/10069528). [Data license](LICENSE.md).
+## Source and license
+
+Kang et al. (2018), doi:10.1038/nbt.4042; GSE96583; SingleCellExperiment conversion doi:10.5281/zenodo.10069528. [Data license](LICENSE.md).

@@ -1,11 +1,15 @@
 {
   "dataset": "hpap_t1d",
-  "cells": 1531,
-  "genes": 240,
   "donors": 16,
-  "states": ["Acinar", "Alpha", "Beta", "Ductal"],
-  "conditions": ["T1D", "control"],
-  "bytes": 253716,
   "source": "Fasolino et al. (2022), doi:10.1038/s42255-022-00531-x; CELLxGENE dataset 49ba32ba-16d3-47b5-b16c-e851de62f656",
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "scope": "Full-data fitting input",
+  "files": [
+    {
+      "name": "input.rds",
+      "cells": 48994,
+      "genes": 420,
+      "bytes": 46878842
+    }
+  ]
 }

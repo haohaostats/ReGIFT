@@ -1,13 +1,19 @@
 # Data for ReGIFT
 
-Compact real-data inputs for fitting ReGIFT. Each directory contains one compressed R object and loading instructions.
+Complete fitting inputs, with the original cell and gene order.
 
-| Dataset | Cells | Genes | Donors | Download size | Data license |
-| --- | ---: | ---: | ---: | ---: | --- |
-| [kang_ifnb](kang_ifnb/) | 1,593 | 240 | 8 | 164 KB | CC-BY-4.0 |
-| [parse_tnf](parse_tnf/) | 2,400 | 240 | 12 | 300 KB | CC-BY-NC-4.0 |
-| [hpap_t1d](hpap_t1d/) | 1,531 | 240 | 16 | 248 KB | CC-BY-4.0 |
+| Dataset | Input | Size (MB) | Data license |
+| --- | --- | ---: | --- |
+| [kang_ifnb](kang_ifnb/) | 24,673 cells × 3,000 genes; full-data fit | 27.2 | CC-BY-4.0 |
+| [parse_tnf](parse_tnf/) | 12 training folds; 320 genes per fold | 172.6 total | CC-BY-NC-4.0 |
+| [hpap_t1d](hpap_t1d/) | 48,994 cells × 420 genes; full-data fit | 46.9 | CC-BY-4.0 |
 
-Download a dataset's `input.rds` using its GitHub **Raw / Download raw file** button, then use `readRDS()` to load it. These three directories are distributed separately from the installed R package. The package also includes `regift_example.rda`, available through `data(regift_example)`.
+Download RDS files using GitHub's **Raw / Download raw file** button.
+Each directory includes instructions for [fit_input.R](fit_input.R), which applies
+cohort-specific preprocessing and fitting settings with ReGIFT 0.1.0.
+The files are distributed separately from the installed R package.
+`data(regift_example)` continues to load the small built-in package example.
 
-The MIT license covers ReGIFT code. Dataset-specific licenses are listed above and in each directory.
+The files contain fitting inputs; held-out evaluation data and scoring workflows
+are separate. See each dataset's scope description.
+The MIT license covers ReGIFT code; the datasets retain their source licenses.

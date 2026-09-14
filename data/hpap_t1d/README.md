@@ -1,27 +1,32 @@
 # hpap_t1d
 
-1,531 cells, 240 genes, 16 donors, and four cell states.
+48,994 cells and 420 genes from sixteen donors; the complete full-data fitting matrix.
 
-Conditions: T1D, control. States: Acinar, Alpha, Beta, Ductal.
+## Run ReGIFT
 
-## Use with ReGIFT
-
-Run from the repository root after installing ReGIFT:
+Install ReGIFT 0.1.0 and run from the repository root:
 
 ```r
 library(ReGIFT)
+source("data/fit_input.R")
 x <- readRDS("data/hpap_t1d/input.rds")
-set.seed(20260914)
-fit <- regift(counts = x$counts, meta = x$meta, donor = "donor",
-              sample = "sample", condition = "condition", state = "state",
-              reference = x$reference, threads = 2, max_iter = 100)
-head(regift_response_table(fit))
+fit <- fit_regift_input(x, dataset = "hpap_t1d")
+response <- regift_predict_response(fit)
 ```
 
-`input.rds` contains cells-by-genes sparse integer `counts`, aligned `meta`, `genes`, `contrasts`, `reference`, and `provenance`. The metadata contains only cell, donor, sample, condition, and state. `regift()` constructs its working response from these counts.
+`counts` is a cells-by-genes sparse count matrix. `meta` retains the donor,
+sample, condition, state, and available cell identifiers. `genes` gives the
+column order; `contrasts` gives the original condition contrast.
+The loader applies the original fitting settings and working-response rules.
 
-## Preparation and source
+## Scope
 
-Up to 25 cells per donor-condition-state were selected at evenly spaced positions after sorting source cell identifiers. Four cell states were retained. Within the available selected-gene input, 240 genes were selected by pooled variance of log1p counts normalized to 10,000 counts per cell. Cells with zero counts across selected genes were removed. Count values were preserved.
+These are complete inputs for the fits described above. Kang and HPAP contain
+the full-data matrices, rather than their separately selected validation folds.
+Parse contains training folds. Held-out evaluation matrices, evaluation targets,
+and scoring workflows are not included. Numerical results also depend on the
+software environment and random-number implementation.
 
-Fasolino et al. (2022), doi:10.1038/s42255-022-00531-x; CELLxGENE dataset 49ba32ba-16d3-47b5-b16c-e851de62f656. [Source data](https://cellxgene.cziscience.com/collections/51544e44-293b-4c2b-8c26-560678423380). [Data license](LICENSE.md).
+## Source and license
+
+Fasolino et al. (2022), doi:10.1038/s42255-022-00531-x; CELLxGENE dataset 49ba32ba-16d3-47b5-b16c-e851de62f656. [Data license](LICENSE.md).
