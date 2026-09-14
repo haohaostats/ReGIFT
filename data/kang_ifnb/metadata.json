@@ -1,0 +1,11 @@
+{
+  "dataset": "kang_ifnb",
+  "cells": 1593,
+  "genes": 240,
+  "donors": 8,
+  "states": ["B cells", "CD14+ Monocytes", "CD4 T cells", "NK cells"],
+  "conditions": ["IFNB", "control"],
+  "bytes": 168316,
+  "source": "Kang et al. (2018), doi:10.1038/nbt.4042; GSE96583; SingleCellExperiment conversion doi:10.5281/zenodo.10069528",
+  "license": "CC-BY-4.0"
+}

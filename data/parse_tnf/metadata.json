@@ -1,0 +1,11 @@
+{
+  "dataset": "parse_tnf",
+  "cells": 2400,
+  "genes": 240,
+  "donors": 12,
+  "states": ["B Naive", "CD14 Mono", "CD4 Memory", "NK"],
+  "conditions": ["TNF", "control"],
+  "bytes": 307388,
+  "source": "Parse Biosciences, 10 Million Human PBMCs in a Single Experiment; https://www.parsebiosciences.com/datasets/10-million-human-pbmcs-in-a-single-experiment/",
+  "license": "CC-BY-NC-4.0"
+}

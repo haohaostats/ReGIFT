@@ -63,6 +63,13 @@ conditions. Supply `state` labels for state-specific responses. State-specific
 shrinkage is available for two-condition paired or unpaired designs.
 See `?regift` for input requirements and optional parameters.
 
+## Data
+
+Small real-data inputs for IFN-beta PBMC responses, TNF-alpha PBMC responses,
+and pancreatic T1D responses are available in [data/](data/README.md), with
+loading instructions and dataset-specific licenses.
+
 ## License
 
-ReGIFT is released under the MIT License.
+ReGIFT code is released under the MIT License. The datasets retain their
+[source licenses](data/README.md).
