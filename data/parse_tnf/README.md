@@ -19,14 +19,6 @@ sample, condition, state, and available cell identifiers. `genes` gives the
 column order; `contrasts` gives the original condition contrast.
 The loader applies the original fitting settings and working-response rules.
 
-## Scope
-
-These are complete inputs for the fits described above. Kang and HPAP contain
-the full-data matrices, rather than their separately selected validation folds.
-Parse contains training folds. Held-out evaluation matrices, evaluation targets,
-and scoring workflows are not included. Numerical results also depend on the
-software environment and random-number implementation.
-
 ## Source and license
 
 Parse Biosciences, 10 Million Human PBMCs in a Single Experiment; https://www.parsebiosciences.com/datasets/10-million-human-pbmcs-in-a-single-experiment/. [Data license](LICENSE.md).

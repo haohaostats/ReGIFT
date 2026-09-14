@@ -14,6 +14,4 @@ cohort-specific preprocessing and fitting settings with ReGIFT 0.1.0.
 The files are distributed separately from the installed R package.
 `data(regift_example)` continues to load the small built-in package example.
 
-The files contain fitting inputs; held-out evaluation data and scoring workflows
-are separate. See each dataset's scope description.
 The MIT license covers ReGIFT code; the datasets retain their source licenses.

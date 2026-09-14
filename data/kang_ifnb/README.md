@@ -19,14 +19,6 @@ sample, condition, state, and available cell identifiers. `genes` gives the
 column order; `contrasts` gives the original condition contrast.
 The loader applies the original fitting settings and working-response rules.
 
-## Scope
-
-These are complete inputs for the fits described above. Kang and HPAP contain
-the full-data matrices, rather than their separately selected validation folds.
-Parse contains training folds. Held-out evaluation matrices, evaluation targets,
-and scoring workflows are not included. Numerical results also depend on the
-software environment and random-number implementation.
-
 ## Source and license
 
 Kang et al. (2018), doi:10.1038/nbt.4042; GSE96583; SingleCellExperiment conversion doi:10.5281/zenodo.10069528. [Data license](LICENSE.md).
