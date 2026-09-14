@@ -12,6 +12,5 @@ Download RDS files using GitHub's **Raw / Download raw file** button.
 Each directory includes instructions for [fit_input.R](fit_input.R), which applies
 cohort-specific preprocessing and fitting settings with ReGIFT 0.1.0.
 The files are distributed separately from the installed R package.
-`data(regift_example)` continues to load the small built-in package example.
 
 The MIT license covers ReGIFT code; the datasets retain their source licenses.
