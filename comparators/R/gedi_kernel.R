@@ -1,6 +1,3 @@
-
-
-
 gedi_kernel_fit <- function(Y, meta, contrasts, K = 10L,
                             sample_shrinkage = 1, ridge = 1e-5,
                             max_iter = 100L, tol = 1e-4) {

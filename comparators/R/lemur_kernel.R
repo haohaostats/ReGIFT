@@ -1,6 +1,3 @@
-
-
-
 .kernel_ridge_solve <- function(X, Y, ridge = 1e-6) {
   solve(crossprod(X) + diag(ridge, ncol(X)), crossprod(X, Y))
 }

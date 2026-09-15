@@ -1,11 +1,3 @@
-
-
-
-
-
-
-
-
 .cnova_basis <- function(x, variance_cutoff, k_max = 1500L) {
   x <- as.matrix(x)
   max_rank <- min(as.integer(k_max), nrow(x) - 1L, ncol(x) - 1L)

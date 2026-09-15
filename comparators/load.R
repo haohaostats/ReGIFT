@@ -1,4 +1,3 @@
-
 .comparator_root <- local({
   paths <- lapply(sys.frames(), function(frame) frame$ofile)
   paths <- Filter(function(x) is.character(x) && length(x) == 1L, paths)

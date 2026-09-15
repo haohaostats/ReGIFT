@@ -25,9 +25,9 @@
     } else {
       ref <- dc[dc_meta$condition == reference, , drop = FALSE]
       trt <- dc[dc_meta$condition == target, , drop = FALSE]
-      
-      
-      
+
+
+
       theta <- if (nrow(ref) && nrow(trt)) colMeans(trt) - colMeans(ref) else
         numeric(ncol(xhat))
     }

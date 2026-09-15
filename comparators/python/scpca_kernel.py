@@ -53,8 +53,8 @@ def main():
     phi = torch.from_numpy(np.clip(phi_np, 1e-6, 100.0))
     loglib = torch.from_numpy(loglib_np)
     cond_t = torch.from_numpy(cond.astype(np.int64))
-                                                                             
-                                                                
+
+
     design = np.zeros((len(conditions), q + 1), dtype=np.float32)
     design[:, 0] = 1.0
     for j in range(q):

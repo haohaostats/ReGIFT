@@ -1,7 +1,3 @@
-
-
-
-
 .kernel_svd <- function(x, rank) {
   x <- as.matrix(x)
   if (!all(is.finite(x))) stop("Nonfinite matrix supplied to low-rank kernel.")

@@ -94,8 +94,8 @@ def main():
     outdir = Path(args.outdir); outdir.mkdir(parents=True, exist_ok=True)
     with torch.no_grad():
         z, _ = model.encode(enc)
-                                                                         
-                                                                          
+
+
         rho = torch.zeros((n, p))
         unit_library = torch.ones(n)
         for b in range(len(batch_names)):
