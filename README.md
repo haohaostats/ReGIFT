@@ -69,6 +69,10 @@ Complete fitting inputs for IFN-beta PBMC responses, TNF-alpha PBMC responses,
 and pancreatic T1D responses are available in [data/](data/README.md), with
 loading instructions and dataset-specific licenses.
 
+## Comparators
+
+The eight comparator kernels are available in [comparators/](comparators/README.md).
+
 ## License
 
 ReGIFT code is released under the MIT License. The datasets retain their

@@ -22,3 +22,5 @@
 ^data/(kang_ifnb|parse_tnf|hpap_t1d)$
 ^data/README\.md$
 ^data/fit_input\.R$
+
+^comparators$
